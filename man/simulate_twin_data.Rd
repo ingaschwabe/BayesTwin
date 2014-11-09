@@ -34,6 +34,7 @@ item_data$y_mz[1, 1:n_items] #Item responses of twin 1 from MZ family 1
 item_data$y_mz[1, (n_items + 1):(2*n_items)] #Item responses of twin 2 from MZ family 1
 cov_data = simulate_twin_data(n_var = 5)
 Simulates twin data on 10 items with 5 covariates
+simulate_twin_data()
 }
 \keyword{ACE,}
 \keyword{ADE}
