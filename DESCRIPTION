@@ -1,8 +1,11 @@
 Package: BayesTwin
-Title: What the package does (one line)
-Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
-Description: What the package does (one paragraph)
-Depends: R (>= 3.0.3)
-License: What license is it under?
+Type: Package
+Title: Bayesian analysis of twin data
+Version: 1.0
+Date: 2014-09-11
+Author: Inga Schwabe, Stephanie M. van den Berg
+Maintainer: Inga Schwabe <i.schwabe@utwente.nl>
+Depends: R (>= 2.12.1), MCMCpack, foreign
+Description: Bayesian analysis of ACE/ADE model, sumscores and item data
+License: GPL-2
 LazyData: true
