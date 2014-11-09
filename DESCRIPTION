@@ -5,7 +5,10 @@ Version: 1.0
 Date: 2014-09-11
 Author: Inga Schwabe, Stephanie M. van den Berg
 Maintainer: Inga Schwabe <i.schwabe@utwente.nl>
-Depends: R (>= 2.12.1), MCMCpack, foreign
+Depends:
+    R (>= 2.12.1),
+    MCMCpack,
+    foreign
 Description: Bayesian analysis of ACE/ADE model, sumscores and item data
 License: GPL-2
 LazyData: true
