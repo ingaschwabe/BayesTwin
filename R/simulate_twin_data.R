@@ -1,7 +1,6 @@
 #' Simulation of twin data
 #'
-#' This function simulates twin data. The data can be generated as sumscores but also on item level. Item data is simulated under 
-#' a 1 PL Rasch model. It is also possible to simulate covariates. 
+#' This function simulates twin data. The data can be generated as sumscores but also on item level. Item data is simulated under a 1 PL Rasch model. It is also possible to simulate covariates. 
 #' @param nmz refers tot the total number of MZ twins. Defaults to 300
 #' @param ndz refers tot the total number of DZ twins. Defaults to 500
 #' @param var_a refers to variance due to additive genetic effects. Defaults to 0.5

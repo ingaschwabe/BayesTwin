@@ -5,7 +5,7 @@
 \title{Simulation of twin data}
 \usage{
 simulate_twin_data(nmz = 300, ndz = 500, var_a = 0.5, var_c = 0.3,
-  var_e = 0.2, model = "ACE", n_items = 0)
+  var_e = 0.2, model = "ACE", n_items = 0, n_var = 0)
 }
 \arguments{
 \item{nmz}{refers tot the total number of MZ twins. Defaults to 300}
@@ -20,15 +20,20 @@ simulate_twin_data(nmz = 300, ndz = 500, var_a = 0.5, var_c = 0.3,
 
 \item{model}{refers to used model ("ACE", "ADE"). Defaults to "ACE"}
 
-\item{n_item}{refers to the number of items. Defaults to 0 (sumscores are simulated)}
+\item{n_items}{refers to the number of items. Defaults to 0 (sumscores are simulated)}
+
+\item{n_var}{refers to the number of covariates. Defaults to 0 (no covariates)}
 }
 \description{
-This function simulates twin data. The data can be generated as sumscores but also on item level. Item data is simulated under
-a 1 PL Rasch model.
+This function simulates twin data. The data can be generated as sumscores but also on item level. Item data is simulated under a 1 PL Rasch model. It is also possible to simulate covariates.
 }
 \examples{
-simulate_twin_data(n_items = 60)
-Simualtes twin data on 60 items with the other parameters set to their default values.
+itemdata = simulate_twin_data(n_items = 60)
+Simulates twin data on 60 items with the other parameters set to their default values.
+item_data$y_mz[1, 1:n_items] #Item responses of twin 1 from MZ family 1
+item_data$y_mz[1, (n_items + 1):(2*n_items)] #Item responses of twin 2 from MZ family 1
+cov_data = simulate_twin_data(n_var = 5)
+Simulates twin data on 10 items with 5 covariates
 }
 \keyword{ACE,}
 \keyword{ADE}
