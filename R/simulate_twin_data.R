@@ -1,23 +1,3 @@
-#' Simulation of twin data
-#'
-#' This function simulates twin data. The data can be generated as sumscores but also on item level. Item data is simulated under a 1 PL Rasch model. It is also possible to simulate covariates. 
-#' @param nmz refers tot the total number of MZ twins. Defaults to 300
-#' @param ndz refers tot the total number of DZ twins. Defaults to 500
-#' @param var_a refers to variance due to additive genetic effects. Defaults to 0.5
-#' @param var_c refers to variance due to shared-environmental effects. Defaults to 0.3
-#' @param var_e refers to variance due to unique-environmental effects. Defautls to 0.2
-#' @param model refers to used model ("ACE", "ADE"). Defaults to "ACE"
-#' @param n_items refers to the number of items. Defaults to 0 (sumscores are simulated)
-#' @param n_var refers to the number of covariates. Defaults to 0 (no covariates)
-#' @keywords twin data, ACE, ADE
-#' @export
-#' @examples
-#' itemdata = simulate_twin_data(n_items = 60)
-#' Simulates twin data on 60 items with the other parameters set to their default values.  
-#' item_data$y_mz[1, 1:n_items] #Item responses of twin 1 from MZ family 1
-#' item_data$y_mz[1, (n_items + 1):(2*n_items)] #Item responses of twin 2 from MZ family 1 
-#' cov_data = simulate_twin_data(n_var = 5)
-#' Simulates twin data on 10 items with 5 covariates
 simulate_twin_data <- function(nmz = 300, ndz = 500, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
                                model = "ACE", n_items = 0, n_var = 0){
     
