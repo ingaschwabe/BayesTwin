@@ -6,15 +6,28 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+This function simulates twin data. It can be use to simulate single responses (sumscores), but also to 
+simuulate item data. Item data is simulated on basis of the 1PL Rasch model (Rasch, 1960). 
 }
 \usage{
-simulate_twin_data(x)
+simulate_twin_data(nmz = 300, ndz = 500, var_a = 0.5, 
+                   var_c = 0.3,  var_e = 0.2,
+                   model = "ACE", n_items = 0, n_var = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-}
+  \item{nmz}{a numeric value, total number of MZ twins}
+  \item{ndz}{a numeric value, total number of DZ twins}
+  \item{var_a}{a numeric value, variance due to genetic effects. 
+               Defaults to 0.5}
+  \item{var_c}{a numeric value, variance due to shared-environmental effects. 
+               Defaults to 0.3}
+  \item{var_e}{a numeric value, variance due to unique-environmental effects. 
+               Defaults to 0.2}
+  \item{model}{specify the twin model that is used. 
+               At this moment only "ACE" available. "ADE" coming in the future}
+  \item{n_items}{numeric value, number of items when item data is simulated}
+  \item{n_var}{numeric value, number of covariates that are simulated}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -28,6 +41,7 @@ simulate_twin_data(x)
 }
 \references{
 %% ~put references to the literature/web site here ~
+Rasch G (1960) Probabilistic models for some intelligence and attainment tests. Danish Institute or Educational Research, Copenhagen
 }
 \author{
 %%  ~~who you are~~
