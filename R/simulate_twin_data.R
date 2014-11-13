@@ -195,7 +195,7 @@ simulate_twin_data <- function(nmz, ndz, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
     }
     
     
-    if(n_var > 0){return_list = list(y_mz, y_dz = y_dz, cov_mz = cov_mz[,c(2:n_var, (n_var + 2):(2*n_var))], 
+    if(n_var > 0){return_list = list(y_mz = y_mz, y_dz = y_dz, cov_mz = cov_mz[,c(2:n_var, (n_var + 2):(2*n_var))], 
                                      cov_dz = cov_dz[,c(2:n_var, (n_var + 2):(2*n_var))])
     } else {return_list = list(y_mz = y_mz, y_dz = y_dz)}
     
