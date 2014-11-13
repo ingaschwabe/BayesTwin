@@ -1,2 +1,5 @@
 export(simulate_twin_data)
 import(MCMCpack)
+import(foreign)
+import(R.utils)
+import(rjags)
