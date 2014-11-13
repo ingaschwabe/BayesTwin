@@ -10,5 +10,4 @@ Depends:
     MCMCpack,
     foreign
 Description: Bayesian analysis of twin data (ACE/ADE model), also on the latent niveau on basis of an 1 PL Rasch model.
-It is also possible to estimate genotype by environment interaction. 
 License: GPL-2
