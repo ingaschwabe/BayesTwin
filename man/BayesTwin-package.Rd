@@ -7,7 +7,7 @@
 \description{
     This package can be used to perform bayesian analysis of twin data. Using Gibbs sampling (Geman & Geman 1984;       Gelfand & Smith 1990; Gelman et al. 2004), twin data can be analysed on basis of an ACE or ADE model (Jinks & Fulker, 1970). It is also possible to estimate genotype by environment interaction. 
     
-    When item data is available, it is also possible to analyse the data on the latent niveau. In that case, a measurement model (1 PL Rasch model, Rasch 1960) is incorporated into the biometric (ACE/ADE) model. 
+When item data is available, it is also possible to analyse the data on the latent niveau. In that case, a measurement model (1 PL Rasch model, Rasch 1960) is incorporated into the biometric (ACE/ADE) model. 
 }
 \details{
     \tabular{ll}{
@@ -17,7 +17,7 @@
         Date: \tab 2014-11-09\cr
         License: \tab GPL-2\cr
     }
-    The main functions can be used to .. With \code{simulate_twin_data} you can simulate twin data. 
+The main functions can be used to .. With \code{simulate_twin_data} you can simulate twin data. 
 }
 \author{
    Inga Schwabe <i.schwabe@utwente.nl>, Stéphanie M. van den Berg
