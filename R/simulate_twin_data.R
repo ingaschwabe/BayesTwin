@@ -1,4 +1,4 @@
-simulate_twin_data <- function(nmz = 300, ndz = 500, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
+simulate_twin_data <- function(nmz, ndz, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
                                model = "ACE", n_items = 0, n_var = 0){
     
     #I. Simulate genetic additive effects and common shared env. effects for MZ twins: 
