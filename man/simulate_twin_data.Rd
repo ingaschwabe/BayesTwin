@@ -6,7 +6,7 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-This function simulates twin data on basis of the ACE or ADE (coming in the future) model (Jinks & Fulker, 1970). It can be use to simulate single responses (sumscores), but also to simuulate item data. Item data is simulated on basis of the 1PL Rasch model (Rasch, 1960). It is also possible to simulate responses to covariates. 
+This function simulates twin data on basis of the ACE or ADE (coming in the future) model (Jinks & Fulker, 1970). It can be use to simulate single responses (sumscores), but also to simuulate item data. Item data is simulated on basis of the 1PL Rasch model (Rasch, 1960). Answers to covariates can be simulated as well. 
 }
 \usage{
 simulate_twin_data(nmz, ndz, 
