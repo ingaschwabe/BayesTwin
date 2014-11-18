@@ -55,22 +55,23 @@ mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
         ptm = proc.time()
         setTxtProgressBar(pb, t)
         
-        #1. Sample A_i and C_i for MZ twins: 
-        e_a_mz = (2/var_e + 1/var_a)^-1 * ((y_mz[,1] + y_mz[,2] - 2*c_mz)/var_e) 
-        a_mz = rnorm(n_mz,e_a_mz, sqrt((1/var_a + 2/var_e)^-1))
+        #1. Sample C_i and A_i for MZ twins:
+        e_c_mz = (1/var_a + 1/var_c)^-1 * (a_mz/var_a) 
+        c_mz = rnorm(n_mz, e_c_mz, sqrt( (1/var_c + 1/var_a)^-1) )
         
-        e_c_mz = (2/var_e + 1/var_c)^-1 * ((y_mz[,1] + y_mz[,2] - 2*a_mz)/var_e) 
-        c_mz = rnorm(n_mz, e_c_mz, sqrt((1/var_c + 2/var_e)^-1))
+        e_a_mz = (2/var_e + 1/var_a)^-1 * (    (y_mz[,1] + y_mz[,2])/var_e + c_mz/var_a) 
+        a_mz = rnorm(n_mz, e_a_mz, sqrt((1/var_a + 2/var_e)^-1))
         
-        #2. Sample A1_i and A2_ij and C_i for DZ twins: 
-        a1_dz = rnorm(n_dz, 2/3 * apply(a2_dz, 1, mean), sqrt(var_a/6))
+        #2. Sample C_i, A1_i and A2_ij for DZ twins: 
+        e_c_dz = (2/var_a + 1/var_c)^-1 * ( (2*a1_dz)/var_a )
+        c_dz = rnorm(n_dz, e_c_dz, sqrt((2/var_a + 1/var_c)^-1))        
         
-        e_a2_dz_twin1 = (1/var_e + 2/var_a)^-1 * ( (y_dz[,1] - c_dz)/var_e + (2*a1_dz)/var_a) 
-        e_a2_dz_twin2 = (1/var_e + 2/var_a)^-1 * ( (y_dz[,2] - c_dz)/var_e + (2*a1_dz)/var_a) 
-        a2_dz = cbind(rnorm(n_dz,e_a2_dz_twin1, sqrt((2/var_a + 1/var_e)^-1)),
+        a1_dz = rnorm(n_dz, 1/3 * ( 2 * apply(a2_dz, 1, mean) + c_dz), sqrt(var_a/6))
+        
+        e_a2_dz_twin1 = (1/var_e + 2/var_a)^-1 * ( y_dz[,1]/var_e + (2*a1_dz)/var_a) 
+        e_a2_dz_twin2 = (1/var_e + 2/var_a)^-1 * ( y_dz[,2]/var_e + (2*a1_dz)/var_a) 
+        a2_dz = cbind(rnorm(n_dz, e_a2_dz_twin1, sqrt((2/var_a + 1/var_e)^-1)),
                       rnorm(n_dz, e_a2_dz_twin2, sqrt((2/var_a + 1/var_e)^-1)))
-        e_c_dz = (2/var_e + 1/var_c)^-1 * ( (y_dz[,1] + y_dz[,2] - a2_dz[,1] - a2_dz[,2])/var_e )
-        c_dz = rnorm(n_dz, e_c_dz, sqrt((2/var_e + 1/var_c)^-1))
         
         #3. Sample variance components: 
         alpha_tilde_c = alpha + n/2
@@ -78,11 +79,12 @@ mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
         var_c = rinvgamma(1, alpha_tilde_c, beta_tilde_c)
         
         alpha_tilde_e = alpha + n
-        beta_tilde_e =  beta + (0.5 *  sum( (y_dz - a2_dz - c_dz)^2)) + (0.5 *  sum( (y_mz - a_mz - c_mz)^2))
+        beta_tilde_e =  beta + (0.5 *  sum( (y_dz - a2_dz)^2)) + (0.5 *  sum( (y_mz - a_mz)^2))
         var_e = rinvgamma(1, alpha_tilde_e, beta_tilde_e)
         
         alpha_tilde_a = alpha + n_dz + 0.5*n_mz
-        beta_tilde_a = beta + (2*sum((a1_dz - apply(a2_dz, 1, mean))^2)) + (0.5 * sum(a_mz^2)) + sum(a1_dz^2) 
+        beta_tilde_a = beta + (2*sum((a1_dz - apply(a2_dz, 1, mean))^2)) + (0.5 * sum( (a_mz - c_mz)^2)) + 
+            sum( (a1_dz - c_dz)^2) 
         var_a = rinvgamma(1, alpha_tilde_a, beta_tilde_a)
         
         #Set rest of parameters back to true parameter: 
@@ -90,21 +92,22 @@ mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
         #         var_c = 0.3; 
         #         var_e = 0.2
         
-        #         a_mz = true_a_mz
-        #         a1_dz = true_a1_dz
-        #         a2_dz = true_a2_dz
-        #         c_mz = true_c_mz
+        #       c_mz = true_c_mz
         #          c_dz = true_c_dz
+        #     a_mz = true_a_mz
+        #     a1_dz = true_a1_dz
+        #     a2_dz = true_a2_dz
+        
         
         #Store parameter estimates: 
         if( t>burnin && (t-burnin)%%skip == 0 ) {
             #print(paste("Iteration Number",t))     
             tt = tt+1
-            store_a_mz[,tt] = a_mz
-            store_c_mz[,tt] = c_mz
-            store_a1_dz[,tt] = a1_dz
-            store_a2_dz[,,tt] = a2_dz
-            store_c_dz[,tt] = c_dz
+            #store_a_mz[,tt] = a_mz
+            #store_c_mz[,tt] = c_mz
+            #store_a1_dz[,tt] = a1_dz
+            #store_a2_dz[,,tt] = a2_dz
+            #store_c_dz[,tt] = c_dz
             store_var_a[tt] = var_a
             store_var_c[tt] = var_c
             store_var_e[tt] = var_e
@@ -114,11 +117,11 @@ mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
     }# n_iterations
     
     return(  list(
-        a_mz = store_a_mz, 
-        c_mz = store_c_mz,
-        a1_dz = store_a1_dz, 
-        a2_dz = store_a2_dz, 
-        c_dz = store_c_dz, 
+        #a_mz = store_a_mz, 
+        #c_mz = store_c_mz,
+        #a1_dz = store_a1_dz, 
+        #a2_dz = store_a2_dz, 
+        #c_dz = store_c_dz, 
         var_a = store_var_a,
         var_c = store_var_c,
         var_e = store_var_e
