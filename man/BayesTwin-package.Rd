@@ -29,7 +29,7 @@ Gelman A., Carlin, J.B., Stern, H.S. & Rubin, D.B. (2004). Bayesian data analysi
 
 Gelman A. & Rubin, D.B. (1992). Inference from iterative simulation using multiple sequences. Stat Sci 7(4), 457-€“511.
 
-Geman S, Geman D. (1984) Stochastic relaxation, gibbs distributions and the bayesian restoration of images. IEEE Trans Pattern Anal Mach Intell 6(6), 721â€“741.
+Geman S, Geman D. (1984) Stochastic relaxation, gibbs distributions and the bayesian restoration of images. IEEE Trans Pattern Anal Mach Intell 6(6), 721-€“741.
 
 Rasch, G. (1960). Probabilistic models for some intelligence and attainment tests. Danish Institute or Educational Research, Copenhagen
 
