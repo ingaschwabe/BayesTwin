@@ -22,8 +22,6 @@ The main functions can be used to .. With \code{simulate_twin_data} you can simu
 }
 \references{
 Jinks, J. L. & Fulker, D.W. (1970). Comparison of the biometrical genetical, mava, and classical approaches to the analysis of human behavior. Psychol Bull, 73(5), 410--423.
-
-Gelfand A.E & Smith, A.F.M. (1990). Sampling-based approaches to calculating marginal densities. J Am Stat Assoc, 85(410), 398--€“409.
 }
 \note{
     Analysis of genotype by environment interaction requires the program "JAGS" (Just Another Gibbs Sampler) to be in the PATH variable. This program can be obtained from http://mcmc-jags.sourceforge.net.
