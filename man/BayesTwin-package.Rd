@@ -21,7 +21,6 @@ The main functions can be used to .. With \code{simulate_twin_data} you can simu
    Inga Schwabe <i.schwabe@utwente.nl>, Stephanie M. van den Berg
 }
 \references{
-Jinks, J. L. & Fulker, D.W. (1970). Comparison of the biometrical genetical, mava, and classical approaches to the analysis of human behavior. Psychol Bull, 73(5), 410--423.
 }
 \note{
     Analysis of genotype by environment interaction requires the program "JAGS" (Just Another Gibbs Sampler) to be in the PATH variable. This program can be obtained from http://mcmc-jags.sourceforge.net.
