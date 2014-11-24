@@ -51,10 +51,9 @@ Responses of all MZ twins to covariates. A matrix of nmz rows and n_var columns.
 }
 
 \references{
-%% ~put references to the literature/web site here ~
-Jinks, J. L. & Fulker, D.W. (1970). Comparison of the biometrical genetical, mava, and classical approaches to the analysis of human behavior. Psychol Bull, 73(5), 311-€“349.
+Jinks, J. L. & Fulker, D.W. (1970). Comparison of the biometrical genetical, mava, and classical approaches to the analysis of human behavior. Psychol Bull, 73(5), 311--€“349.
 
-Rasch G (1960) Probabilistic models for some intelligence and attainment tests. Danish Institute or Educational Research, Copenhagen
+Rasch, G. (1960) Probabilistic models for some intelligence and attainment tests. Danish Institute or Educational Research, Copenhagen
 }
 
 \author{
