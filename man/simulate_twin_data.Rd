@@ -58,7 +58,7 @@ Rasch G (1960) Probabilistic models for some intelligence and attainment tests. 
 }
 
 \author{
-Inga Schwabe <i.schwabe@utwente.nl>, Stéphanie M. van den Berg
+Inga Schwabe <i.schwabe@utwente.nl>, Stephanie M. van den Berg
 }
 
 \note{
