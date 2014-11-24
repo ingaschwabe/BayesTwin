@@ -24,15 +24,6 @@ The main functions can be used to .. With \code{simulate_twin_data} you can simu
 Jinks, J. L. & Fulker, D.W. (1970). Comparison of the biometrical genetical, mava, and classical approaches to the analysis of human behavior. Psychol Bull, 73(5), 410--423.
 
 Gelfand A.E & Smith, A.F.M. (1990). Sampling-based approaches to calculating marginal densities. J Am Stat Assoc, 85(410), 398--€“409.
-
-Gelman A., Carlin, J.B., Stern, H.S. & Rubin, D.B. (2004). Bayesian data analysis, Second edition. Chapman and Hall, London
-
-Gelman A. & Rubin, D.B. (1992). Inference from iterative simulation using multiple sequences. Stat Sci 7(4), 457--€“511.
-
-Geman S, Geman D. (1984) Stochastic relaxation, gibbs distributions and the bayesian restoration of images. IEEE Trans Pattern Anal Mach Intell 6(6), 721--€“741.
-
-Rasch, G. (1960). Probabilistic models for some intelligence and attainment tests. Danish Institute or Educational Research, Copenhagen
-
 }
 \note{
     Analysis of genotype by environment interaction requires the program "JAGS" (Just Another Gibbs Sampler) to be in the PATH variable. This program can be obtained from http://mcmc-jags.sourceforge.net.
