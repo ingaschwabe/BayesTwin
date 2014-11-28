@@ -82,9 +82,9 @@ mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
         beta_tilde_e =  beta + (0.5 *  sum( (y_dz - a2_dz)^2)) + (0.5 *  sum( (y_mz - a_mz)^2))
         var_e = rinvgamma(1, alpha_tilde_e, beta_tilde_e)
         
-        alpha_tilde_a = alpha + n_dz + 0.5*n_mz
-        beta_tilde_a = beta + (2*sum((a1_dz - apply(a2_dz, 1, mean))^2)) + (0.5 * sum( (a_mz - c_mz)^2)) + 
-            sum( (a1_dz - c_dz)^2) 
+        alpha_tilde_a = alpha + 1.5*n_dz + 0.5*n_mz
+        beta_tilde_a = beta + (sum((a1_dz - a2_dz[,1])^2)) + (sum((a1_dz - a2_dz[,2])^2))  + (0.5 * sum( (a_mz - c_mz)^2)) + 
+                sum( (a1_dz - c_dz)^2) 
         var_a = rinvgamma(1, alpha_tilde_a, beta_tilde_a)
         
         #Set rest of parameters back to true parameter: 
