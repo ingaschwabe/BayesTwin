@@ -7,16 +7,7 @@
 # organizes the output
 #==========================================================
 
-sumscores_ade <- function(data_mz, data_dz, n_burnin, n_iter){
-    
-    #Install packages when necessary (later niet meer nodig!!)
-    if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
-    if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
-    if(!require(MCMCpack)){ install.packages('MASS'); require(MASS)}    
-    if(!require(MCMCpack)){ install.packages('rjags'); require(rjags)}    
-    
-    #Load packages:
-    require(rjags, MCMCpack, R.utils)
+sumscores_ade <- function(data_mz, data_dz, n_burnin, n_iter){ 
     
     # Determine number of twin pairs
     n_mz <- nrow(data_mz); n_dz <- nrow(data_dz)
