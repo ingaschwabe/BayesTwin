@@ -11,7 +11,7 @@
 
 sumscores_cov <- function(data_mz, data_dz, 
                           X_mz_twin1, X_mz_twin2, 
-                          X_dz_twin2, X_dz_twin2,
+                          X_dz_twin1, X_dz_twin2,
                           data_mz_cov, data_dz_cov, 
                           n_burnin, n_iter){
   

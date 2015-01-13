@@ -12,23 +12,6 @@
 #if(!suppressMessages(require(xtable))){ install.packages('xtable'); suppressMessages(require(xtable))}
 
 
-## Function to compute highest posterior density interval for a parameter 
-## sample1 : sample parameter of interest
-## rel.int  : reliability interval, e.g. 0.95
-HPD <- function(sample1, rel.int)
-{
-	rel.int <- (1 - rel.int)/2
-	lower <- round(length(sample1) * rel.int, 0)
-	upper <- round(length(sample1) * (1 - rel.int), 0)
-	diff.int <- upper - lower
-	HPDo <- sample1[order(sample1)][1:lower]
-	HPDb <- sample1[order(sample1)][(diff.int + 1):upper]
-	HPDI <- round(c(HPDo[order(HPDb - HPDo)[1]], HPDb[order(HPDb - HPDo)[
-		1]]), 5)
-        return(HPDI)
-}
- 
- 
  
 # reparameterization functions
 # delta defined as p(aff|cotwin aff) - p(aff | cotwin not aff)
@@ -62,55 +45,55 @@ logpost<- function(theta, par)
 } # end function logpost
 
 # Gather data:
-data<- matrix(c(dataMZ, dataDZ), 3,2)
+#data<- matrix(c(dataMZ, dataDZ), 3,2)
 
 # Get parameters values for joint posterior:
-par <- list(alpha1=1, alpha2=1, beta1=1, beta2=1, gamma1=1,gamma2=1, data=data)
+#par <- list(alpha1=1, alpha2=1, beta1=1, beta2=1, gamma1=1,gamma2=1, data=data)
 
 # Compute a laplace approximation of posterior mode and variance:
-outlaplace <- laplace(logpost, c(-1,0,0), par)
-proposal = list(var=outlaplace$var, scale=1)
+#outlaplace <- laplace(logpost, c(-1,0,0), par)
+#proposal = list(var=outlaplace$var, scale=1)
 
 # sample parameters from unconstrained posterior
-out <-rwmetrop(logpost, proposal, start=outlaplace$mode, NIterations, par)
-pi <- 1/ (1+ exp(-1*out$par[,1])) # transforming mu into pi
-delta.mz <- (exp(out$par[,2])-1) / (1+ exp(out$par[,2]))
-delta.dz <- (exp(out$par[,3])-1) / (1+ exp(out$par[,3]))
+#out <-rwmetrop(logpost, proposal, start=outlaplace$mode, NIterations, par)
+#pi <- 1/ (1+ exp(-1*out$par[,1])) # transforming mu into pi
+#delta.mz <- (exp(out$par[,2])-1) / (1+ exp(out$par[,2]))
+#delta.dz <- (exp(out$par[,3])-1) / (1+ exp(out$par[,3]))
 
 # transforming pi and deltas into concordance rates
-qmz <- q(pi,delta.mz) 
-qdz <- q(pi,delta.dz)
+#qmz <- q(pi,delta.mz) 
+#qdz <- q(pi,delta.dz)
 
  
 # select posterior samples that satisfy constraint
-satisfied<- which( (max(-1, (pi-1)/pi) < delta.mz) & (delta.mz< 1) & (max(-1, (pi-1)/pi) < delta.dz) & (delta.dz< 1))
-posterior <- cbind(pi,qmz, qdz)[satisfied,]
-posterior <- posterior[(NBurnin+1):NIterations, ] # first 1000 is burn-in
+#satisfied<- which( (max(-1, (pi-1)/pi) < delta.mz) & (delta.mz< 1) & (max(-1, (pi-1)/pi) < delta.dz) & (delta.dz< 1))
+#posterior <- cbind(pi,qmz, qdz)[satisfied,]
+#posterior <- posterior[(NBurnin+1):NIterations, ] # first 1000 is burn-in
 
 
 # Make a PDF with trace plots
-pdf('PosteriorSamples.pdf')
-par(mfrow=c(3,1))
-for (i in 1:3) {plot((NBurnin+1):NIterations,posterior[,i], main = paste("Posterior samples of" , c('pi', 'q.mz','q.dz')[i]),ylab=c('pi', 'q.mz','q.dz')[i], type='l', xlab="iteration")}
-dev.off() 
+#pdf('PosteriorSamples.pdf')
+#par(mfrow=c(3,1))
+#for (i in 1:3) {plot((NBurnin+1):NIterations,posterior[,i], main = paste("Posterior samples of" , c('pi', 'q.mz','q.dz')[i]),ylab=c('pi', 'q.mz','q.dz')[i], type='l', xlab="iteration")}
+#dev.off() 
 
 # Make a PDF with marginal posterior density plots
-pdf('PosteriorDensities.pdf')
-par(mfrow=c(1,3))
-for (i in 1:3) 
-        {
-        if (i==1) 
-                {
-                prut<-density(posterior[,i])
-                plot( function(x) dbeta(x, NAffectedPreviousStudies+1, NNotAffectedPreviousStudies+1) , main = '',xlab=c('pi', 'q.mz','q.dz')[i], ylab='Density',col=2,ylim=c(0,max(prut$y)) )
-                points(density(posterior[,i]), type ='l')
-                } else 
-                        plot(density(posterior[,i]), main = '',xlab=c('pi', 'q.mz','q.dz')[i], ylab='Density')
-                        lines(x=c(0,1), y=c(0,0), col=2, lty=1)
-        }
-dev.off()
+#pdf('PosteriorDensities.pdf')
+#par(mfrow=c(1,3))
+#for (i in 1:3) 
+#        {
+#        if (i==1) 
+#                {
+#                prut<-density(posterior[,i])
+#                plot( function(x) dbeta(x, NAffectedPreviousStudies+1, NNotAffectedPreviousStudies+1) , main = '',xlab=c('pi', 'q.mz','q.dz')[i], ylab='Density',col=2,ylim=c(0,max(prut$y)) )
+#                points(density(posterior[,i]), type ='l')
+#                } else 
+#                        plot(density(posterior[,i]), main = '',xlab=c('pi', 'q.mz','q.dz')[i], ylab='Density')
+#                        lines(x=c(0,1), y=c(0,0), col=2, lty=1)
+#        }
+#dev.off()
 
 
 # Determine 95% Highest Posterior Density intervals
-HPDintervals <-t( matrix( c( HPD(posterior[,1],0.95), HPD(posterior[,2],0.95) , HPD(posterior[,3],0.95)), 2, 3) )
+#HPDintervals <-t( matrix( c( HPD(posterior[,1],0.95), HPD(posterior[,2],0.95) , HPD(posterior[,3],0.95)), 2, 3) )
  
