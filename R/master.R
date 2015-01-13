@@ -2,10 +2,10 @@
 # Master function that calls subroutines
 # BayesTwin package - Bayesian Analysis of Twin Data 
 #==========================================================
-setwd("C:/Users/schwabei/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
-setwd("/Users/stephanievandenberg/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
-setwd("C:/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
-setwd("/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+#setwd("C:/Users/schwabei/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+#setwd("/Users/stephanievandenberg/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+#setwd("C:/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+#setwd("/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 
 twin_analysis = function(data_mz, data_dz, twin1_datacols_phenotype, twin2_datacols_phenotype,
                          twin1_datacols_cov = NA, twin2_datacols_cov = NA,
