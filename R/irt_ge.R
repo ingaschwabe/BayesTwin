@@ -1,17 +1,15 @@
 #==========================================================
 # Analysis of genotype by environment interaction 
 # in twin data. With IRT measurement model
-# function ge_irt.R for BayesTwin package
+# function irt_ge.R for BayesTwin package
 #==========================================================
 
 
 # This function writes a JAGS script for IRT model with GE interaction
 # and draws from the posterior
 # and organizes output
-ge_irt <- function(data_mz=data_mz, data_dz=data_dz, n_burnin=n_burnin, n_iter=n_iter){
+irt_ge <- function(data_mz, data_dz, n_burnin, n_iter){
     
-        
-        
     #Install packages when necessary (later niet meer nodig!!)
     if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
     if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
@@ -138,28 +136,20 @@ ge_irt <- function(data_mz=data_mz, data_dz=data_dz, n_burnin=n_burnin, n_iter=n
     results = matrix(c(var_a, sd_var_a, var_c, sd_var_c, beta0, sd_beta0, beta1, sd_beta1), 2, 4)
     colnames(results) <- c("varA","varC","beta0", "beta1")
     rownames(results) <- c("Posterior mean","Posterior standard deviation")
-    results = as.table(results)
-    
-    #Print results on the fly: 
-    cat("\n") 
-    print(results)
-    cat("\n newline")
-    
-    #Remind the user of the issue of convergence: 
-    
+    results = as.table(results) 
     
     #And save output in a list: 
-    output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_a, 
+    output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                   samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_b = samples_b,
                   hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1)
     
     #Change class of objects in order to use right plot method 
-    class(output) <- c("ge_irt","list")
+    class(output) <- c("ge_irt","list")    
     class(output$samples_var_a) <- "samples"
     class(output$samples_var_c) <- "samples"
     class(output$samples_beta0) <- "samples"
-    class(output$samples_beta1) <- "samples" 
-    
+    class(output$samples_beta1) <- "samples"   
+    class(output$samples_b) <- "samples"
     
     return(output)
 }
@@ -167,19 +157,15 @@ ge_irt <- function(data_mz=data_mz, data_dz=data_dz, n_burnin=n_burnin, n_iter=n
 
 # #Test function: 
 # library(rjags)
-# data = simulate_twin_data(50, 20, n_items = 3)
-# y_mz = data$y_mz
-# y_dz = data$y_dz
-# n_mz = 50; n_dz = 20; n_items = 3; n_burnin = 200; n_iter = 200
-# xx = ge_irt( n_burnin = n_burnin, n_iter = n_iter,
-#        data_mz = y_mz, data_dz = y_dz)
-# 
-# x = xx$samples_var_c
-# plot(x, type = "Sampling plot")'
+'setwd("C:/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+source("simulate_twin_data.R")
+data = simulate_twin_data(50, 20, n_items = 3)
+y_mz = data$y_mz
+y_dz = data$y_dz
+n_mz = 50; n_dz = 20; n_items = 3; n_burnin = 200; n_iter = 200
+xx = ge_irt( n_burnin = n_burnin, n_iter = n_iter,
+             data_mz = y_mz, data_dz = y_dz)
+x = xx$samples_var_c
 
-
-
-
-
-
-
+library(rjags)
+'
