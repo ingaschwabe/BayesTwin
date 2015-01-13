@@ -15,4 +15,4 @@ library(devtools)
 install_github("ingaschwabe/BayesTwin")
 
 Note: An error might occur when (an earlier version) of the package is already installed on your system (especially when you're using a Mac).
-In this case, deleting the package folder often helps. The library path can be retrieved by calling the function .libPaths()
+In this case, deleting the package folder often solves the problem. The library path can be retrieved by calling the function .libPaths()
