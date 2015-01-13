@@ -119,21 +119,3 @@ sumscores_ade <- function(data_mz, data_dz, n_burnin, n_iter){
     
     return(output)
     }
-
-
-# #Test function: 
-# library(rjags)
-setwd("/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
-source("simulate_twin_data.R")
-source("HPD.R")
-source("plot.samples.R")
-data = simulate_twin_data(50, 20, n_items = 0)
-data_mz = data$y_mz
-data_dz = data$y_dz
-n_burnin = 200; n_iter = 200
-xx = sumscores_ge(data_mz = data_mz, data_dz = data_dz, n_burnin = 200, n_iter = 200)
-xx
-plot(xx$samples_var_a)'
-
-# Raw data (example): 
-list(mz = structure(.Data=c( 4, 3, 	2, 3,  4, 5,	 4,3, 	1, 2,	 6, 5,	 4, 5	, 3, 2  ), .Dim=c(8, 2)), dz = structure(.Data=c( 3, 5, 2, 4, 2, 2, 4,2, 2, 4, 6, 3, 3, 5, 5, 4 ), .Dim=c(8, 2)),   Singleton = c(4, 5, 2))

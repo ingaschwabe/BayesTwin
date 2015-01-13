@@ -1,8 +1,8 @@
 mcmc <- function(y_mz, y_dz, n_iterations, burnin, skip){
     
     #Install packages when necessary: 
-    if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
-    if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
+    #if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
+    #if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
     
     #Prior values variance components
     alpha = 1

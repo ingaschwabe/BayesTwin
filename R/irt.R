@@ -7,10 +7,10 @@
 irt <- function(data_mz, data_dz, n_burnin, n_iter){
     
     #Install packages when necessary (later niet meer nodig!!)
-    if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
-    if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
-    if(!require(MCMCpack)){ install.packages('MASS'); require(MASS)}    
-    if(!require(MCMCpack)){ install.packages('rjags'); require(rjags)}    
+    #if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
+    #if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
+    #if(!require(MCMCpack)){ install.packages('MASS'); require(MASS)}    
+    #if(!require(MCMCpack)){ install.packages('rjags'); require(rjags)}    
     
     # determine number of twin pairs
     n_mz <- nrow(data_mz) ; n_dz<- nrow(data_dz)

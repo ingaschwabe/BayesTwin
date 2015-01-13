@@ -16,10 +16,10 @@ sumscores_cov <- function(data_mz, data_dz,
                           n_burnin, n_iter){
   
   #Install packages when necessary (later niet meer nodig!!)
-  if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
-  if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
-  if(!require(MCMCpack)){ install.packages('MASS'); require(MASS)}    
-  if(!require(rjags)){ install.packages('rjags'); require(rjags)}    
+  #if(!require(MCMCpack)){ install.packages('MCMCpack'); require(MCMCpack)}
+  #if(!require(R.utils)){ install.packages('R.utils'); require(R.utils)}
+  #if(!require(MCMCpack)){ install.packages('MASS'); require(MASS)}    
+  #if(!require(rjags)){ install.packages('rjags'); require(rjags)}    
   
   # Determine number of twin pairs
   n_mz <- nrow(data_mz); n_dz <- nrow(data_dz)
@@ -183,7 +183,7 @@ sumscores_cov <- function(data_mz, data_dz,
 
 # #Test function: 
 # library(rjags)
-source("simulate_twin_data.R")
+'source("simulate_twin_data.R")
 source("HPD.R")
 source("plot.samples.R")
 data = simulate_twin_data(50, 20, n_items = 0, n_var = 4)
@@ -201,4 +201,4 @@ xx = sumscores_cov(data_mz = data_mz, data_dz = data_dz,
                    X_mz_twin1 = X_mz_twin1, X_mz_twin2 = X_mz_twin2, 
                    X_dz_twin1 = X_dz_twin1, X_dz_twin2 = X_dz_twin2,
                    n_burnin = 200, n_iter = 200)
-plot(xx$samples_var_a)
+plot(xx$samples_var_a)'

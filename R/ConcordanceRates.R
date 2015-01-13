@@ -4,12 +4,12 @@
 # doi:10.1007/s10519-012-9547-9
 
 
-library(xtable)
+#library(xtable)
 
-if(!suppressMessages(require(LearnBayes))){ install.packages('LearnBayes'); suppressMessages(require(LearnBayes))}
-if(!suppressMessages(require(coda))){ install.packages('coda'); suppressMessages(require(coda))}
-if(!suppressMessages(require(KernSmooth))){ install.packages('KernSmooth'); suppressMessages(require(KernSmooth))}
-if(!suppressMessages(require(xtable))){ install.packages('xtable'); suppressMessages(require(xtable))}
+#if(!suppressMessages(require(LearnBayes))){ install.packages('LearnBayes'); suppressMessages(require(LearnBayes))}
+#if(!suppressMessages(require(coda))){ install.packages('coda'); suppressMessages(require(coda))}
+#if(!suppressMessages(require(KernSmooth))){ install.packages('KernSmooth'); suppressMessages(require(KernSmooth))}
+#if(!suppressMessages(require(xtable))){ install.packages('xtable'); suppressMessages(require(xtable))}
 
 
 ## Function to compute highest posterior density interval for a parameter 
@@ -113,10 +113,4 @@ dev.off()
 
 # Determine 95% Highest Posterior Density intervals
 HPDintervals <-t( matrix( c( HPD(posterior[,1],0.95), HPD(posterior[,2],0.95) , HPD(posterior[,3],0.95)), 2, 3) )
- 
-
-
-
-
- 
  

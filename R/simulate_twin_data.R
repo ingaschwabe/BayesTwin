@@ -1,3 +1,9 @@
+#==========================================================
+# Simulation of twin data (ACE model), using sum scores
+# or item scores, optional with GxE and/or environmental 
+# covariates
+#==========================================================
+
 simulate_twin_data <- function(nmz, ndz, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
                                model = "ACE", n_items = 0, n_var = 0){
     

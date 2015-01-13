@@ -138,13 +138,13 @@ twin_analysis = function(data_mz, data_dz, twin1_datacols_phenotype, twin2_datac
 
 #Run function: 
 #Simulate data: 
-source("simulate_twin_data.R")
-data <- simulate_twin_data(nmz = 10, ndz = 20, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-                           model = "ACE", n_items = 8, n_var = 0)
+#source("simulate_twin_data.R")
+#data <- simulate_twin_data(nmz = 10, ndz = 20, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
+#                           model = "ACE", n_items = 8, n_var = 0)
 #IRT + GE
-twin_analysis2 = twin_analysis(data_mz = data_mz, data_dz = data_dz, 
-                               twin1_datacols = 1:8, twin2_datacols = 9:16, 
-                               ordinal = T, model = "ACE", common = T,
-                               n_iter = 100, n_burnin = 100, ge = TRUE)
-twin_analysis2
-plot(twin_analysis2$samples_var_a, type = "Sampling plot")
+#twin_analysis2 = twin_analysis(data_mz = data_mz, data_dz = data_dz, 
+#                               twin1_datacols = 1:8, twin2_datacols = 9:16, 
+#                               ordinal = T, model = "ACE", common = T,
+#                               n_iter = 100, n_burnin = 100, ge = TRUE)
+#twin_analysis2
+#plot(twin_analysis2$samples_var_a, type = "Sampling plot")
