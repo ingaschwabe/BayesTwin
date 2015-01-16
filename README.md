@@ -1,7 +1,7 @@
 ## BayesTwin
 BayesTwin is an R package that can be used to perform bayesian analysis of twin data. 
 
-Caution! This is work under progress! The package is not in any usable state yet.  
+Caution! This is work under progress! 
 
 You can use subroutines (e.g. ACE decomposition with GxE and IRT model: ge_irt.R), but although most functions are based on publications of the package authors, we cannot guarantee that all scripts are bug free as the software is not yet fully tested. All subroutines can be found in the folder R. 
 
