@@ -7,7 +7,7 @@
 #setwd("C:/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 #setwd("/Users/inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 
-twin_analysis = function(data_mz, data_dz, twin1_datacols_phenotype, twin2_datacols_phenotype,
+twin_mcmc = function(data_mz, data_dz, twin1_datacols_p, twin2_datacols_p,
                          twin1_datacols_cov = NA, twin2_datacols_cov = NA,
                          #multivariate = F, ordinal = F, model = "ACE", common = T,
                          n_iter = 10000, n_burnin = 5000, ge = FALSE){
@@ -35,8 +35,8 @@ twin_analysis = function(data_mz, data_dz, twin1_datacols_phenotype, twin2_datac
     n_dz = nrow(data_dz)
     
     #Make sure that first columns are only twin 1, next the twin 2 columns
-    data_mz = data_mz[,c(twin1_datacols_phenotype, twin2_datacols_phenotype)]
-    data_dz = data_dz[,c(twin1_datacols_phenotype, twin2_datacols_phenotype)]
+    data_mz = data_mz[,c(twin1_datacols_p, twin2_datacols_p)]
+    data_dz = data_dz[,c(twin1_datacols_p, twin2_datacols_p)]
     
     #Test if its item data: 
     itemdata = NA
