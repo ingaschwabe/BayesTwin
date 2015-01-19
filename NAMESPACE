@@ -1,5 +1,4 @@
 export(simulate_twin_data)
-export(master)
 export(HPD)
 import(MCMCpack)
 import(foreign)
