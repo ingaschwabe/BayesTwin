@@ -5,7 +5,7 @@
     Bayesian analysis of twin data
 }
 \description{
-This package can be used to perform bayesian analysis of twin data. Using Gibbs sampling (Geman & Geman 1984;       Gelfand & Smith 1990; Gelman et al. 2004), twin data can be analysed on basis of an ACE or ADE model (Jinks & Fulker, 1970). When item data is available, it is also possible to analyse the data on the latent niveau. In that case, a measurement model (1 PL Rasch model, Rasch 1960) is incorporated into the biometric (ACE/ADE) model. 
+This package can be used to perform bayesian analysis of twin data. he most common univariate and multivariate biometric models are included, as well as a method to study concordance rates. In addition, it includes functions that help plot relevant information in figures and compute posterior statistics such as HPD intervals.
 }
 \details{
     \tabular{ll}{
@@ -23,7 +23,7 @@ The main functions can be used to .. With \code{simulate_twin_data} you can simu
 \references{
 }
 \note{
-    Analysis of genotype by environment interaction requires the program "JAGS" (Just Another Gibbs Sampler) to be in the PATH variable. This program can be obtained from http://mcmc-jags.sourceforge.net.
+    Most subroutines require the program "JAGS" (Just Another Gibbs Sampler) to be in the PATH variable. This program can be obtained from http://mcmc-jags.sourceforge.net.
 }
 \examples{
 \dontrun{
