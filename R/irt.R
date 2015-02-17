@@ -9,26 +9,30 @@
 # calling the master function twinUniv)
 #==========================================================
 
-irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
+irt <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
-    if (irt_model == "1PL"{
-        1PL = TRUE
-    } else if (irt_model = "2PL"){
-        2PL = TRUE
-    } else if (irt_model = "GPCM"){
+    
+    PL_1 = FALSE; PL_2 = FALSE; GPCM = FALSE; PCM = FALSE
+    
+    if(irt_model == "1PL"){
+        PL_1 = TRUE
+    } else if (irt_model == "2PL"){
+        PL_2 = TRUE
+    } else if (irt_model == "GPCM"){
         GPCM = TRUE
     } else {
         PCM = TRUE
     }
-    
+        
     #Determine number of twin pairs
     n_mz <- nrow(data_mz) ; n_dz<- nrow(data_dz)
     
     # determine number of phenotypic items
     n_items <- ncol(data_mz)/2
-    
+    Nk <- length(unique(data_mz[,1]))
+        
     #==========================================================
     # I. Write JAGS model file
     #==========================================================
@@ -49,31 +53,31 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
             for (twin in 1:2){
                 pheno_mz[fam,twin] ~ dnorm(f_mz[fam],tau_e)   
             }"),"
-        ",ifelse(1PL,"
+        ",ifelse(PL_1,"
                 #1pl model twin1
                 for (j in 1:n_items){
-                    logit(p[fam,j]) <- pheno_mz[fam,1] - b[j]
+                    logit(p[fam,j]) <- pheno_mz[fam,1] - item_b[j]
                     data_mz[fam,j] ~ dbern(p[fam,j])
                 }      	
     
                 #1pl model twin2
                 for (j in (n_items+1):(2*n_items)){
-                    logit(p[fam,j]) <- pheno_mz[fam,2] - b[j-n_items]
+                    logit(p[fam,j]) <- pheno_mz[fam,2] - item_b[j-n_items]
                     data_mz[fam,j] ~ dbern(p[fam,j])
                 }
         ","
         "),"
 
-        ",ifelse(2PL,"
+        ",ifelse(PL_2,"
                 #2pl model twin1
                 for (j in 1:n_items){
-                    logit(p[fam,j]) <- alpha[j] * (pheno_mz[fam,1] - b[j])
+                    logit(p[fam,j]) <- alpha[j] * (pheno_mz[fam,1] - item_b[j])
                     data_mz[fam,j] ~ dbern(p[fam,j])
                 }          
     
                 #1pl model twin2
-                for (k in (n_items+1):(2*n_items)){
-                    logit(p[fam,j]) <- alpha[j] * (pheno_mz[fam,2] - b[j-n_items])
+                for (j in (n_items+1):(2*n_items)){
+                    logit(p[fam,j]) <- alpha[j - n_items] * (pheno_mz[fam,2] - item_b[j-n_items])
                     data_mz[fam,j] ~ dbern(p[fam,j])
                 }
         ","
@@ -84,7 +88,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 for (j in 1:n_items){
 					for (k in 1:Nk){
 						eta[fam,j,k] <- alpha[j] * (pheno_mz[fam,1] - item_b[j,k])
-                        psum [fam,j,k] <- sum(eta[i,j,1:k])
+                        psum [fam,j,k] <- sum(eta[fam,j,1:k])
                         exp.psum[fam,j,k] <- exp(psum[fam,j,k])
                         prob [fam,j,k] <- exp.psum [fam,j,k]/sum(exp.psum[fam,j,1:Nk])
                      } 
@@ -92,15 +96,15 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 
 				#GPCM for twin 2
 				for (j in (n_items+1):(2*n_items)){
-					for (k in 1:3){
-						eta[i,j,k] <- alpha [j-n_items] * (pheno_mz[i,2] - item_b [j-n_items,k])
-                        psum[i,j,k] <- sum(eta[i,j,1: k])
-                        exp.psum [i,j,k] <- exp(psum[i,j,k])
-                        prob[i,j,k] <- exp.psum[i,j,k]/sum(exp.psum[i,j,1:Nk])
+					for (k in 1:Nk){
+						eta[fam,j,k] <- alpha [j-n_items] * (pheno_mz[fam,2] - item_b[j-n_items,k])
+                        psum[fam,j,k] <- sum(eta[fam,j,1: k])
+                        exp.psum[fam,j,k] <- exp(psum[fam,j,k])
+                        prob[fam,j,k] <- exp.psum[fam,j,k]/sum(exp.psum[fam,j,1:Nk])
                      } 
 				}
                 for (j in 1:(2*n_items)){
-                        data_mz[fam,j] ~ dcat(prob[fam,j,1:k]) # multinomial distr of data
+                        data_mz[fam,j] ~ dcat(prob[fam,j,1:Nk]) # multinomial distr of data
                 }
 
         ","
@@ -111,7 +115,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 for (j in 1:n_items){
 					for (k in 1:Nk){
 						eta[fam,j,k] <- pheno_mz[fam,1] - item_b[j,k]
-                        psum [fam,j,k] <- sum(eta[i,j,1:k])
+                        psum [fam,j,k] <- sum(eta[fam,j,1:k])
                         exp.psum[fam,j,k] <- exp(psum[fam,j,k])
                         prob [fam,j,k] <- exp.psum [fam,j,k]/sum(exp.psum[fam,j,1:Nk])
                      } 
@@ -119,15 +123,15 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 
 				#PCM for twin 2
 				for (j in (n_items+1):(2*n_items)){
-					for (k in 1:3){
-						eta[i,j,k] <- pheno_mz[i,2] - item_b [j-n_items,k]
-                        psum[i,j,k] <- sum(eta[i,j,1: k])
-                        exp.psum [i,j,k] <- exp(psum[i,j,k])
-                        prob[i,j,k] <- exp.psum[i,j,k]/sum(exp.psum[i,j,1:Nk])
+					for (k in 1:Nk){
+						eta[fam,j,k] <- pheno_mz[fam,2] - item_b [j-n_items,k]
+                        psum[fam,j,k] <- sum(eta[fam,j,1: k])
+                        exp.psum [fam,j,k] <- exp(psum[fam,j,k])
+                        prob[fam,j,k] <- exp.psum[fam,j,k]/sum(exp.psum[fam,j,1:Nk])
                      } 
 				}
                 for (j in 1:(2*n_items)){
-                        data_mz[fam,j] ~ dcat(prob[fam,j,1:k]) # multinomial distr of data
+                        data_mz[fam,j] ~ dcat(prob[fam,j,1:Nk]) # multinomial distr of data
                 }
 
         ","
@@ -153,7 +157,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 }"),"
 
 
-        ",ifelse(1PL,"
+        ",ifelse(PL_1,"
                 #1pl model twin1 (DZ)
                 for (j in 1:n_items){
                     logit(p2[fam,j]) <- pheno_dz[fam,1] - item_b[j]
@@ -168,9 +172,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
         ","
         "),"
 
-
-        
-        ",ifelse(2PL,"
+        ",ifelse(PL_2,"
                 #2pl model twin1 (DZ)
                 for (j in 1:n_items){
                     logit(p2[fam,j]) <- alpha[j]*(pheno_dz[fam,1] - item_b[j])
@@ -179,9 +181,10 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     
                 #2pl model twin2 (DZ)
                 for (j in (n_items+1):(2*n_items)){
-                    logit(p2[fam,j]) <- alpha[j]*(pheno_dz[fam,2] - item_b[j-n_items])
+                    logit(p2[fam,j]) <- alpha[j - n_items]*(pheno_dz[fam,2] - item_b[j-n_items])
                     data_dz[fam,j] ~ dbern(p2[fam,j])
                 }
+
         ","
         "),"
 
@@ -197,16 +200,20 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                 for (j in (n_items+1):(2*n_items)){
                     for (k in 1:Nk){
                         etadz[fam,j,k] <- alpha[j-n_items] * (pheno_dz[fam,2] - item_b[j-n_items,k])
-                        psumdz[fam,j,k] <- sum(etadz[fam,j,1: k])
+                        psumdz[fam,j,k] <- sum(etadz[fam,j,1:k])
                         exp.psumdz[fam,j,k] <- exp(psumdz[fam,j,k])
                         probdz[fam,j,k] <- exp.psumdz[fam,j,k]/sum(exp.psumdz[fam,j,1:Nk])
                     } 
                 }
 
+                for (j in 1:(2*n_items)){
+                        data_dz[fam,j] ~ dcat(probdz[fam,j,1:Nk]) # multinomial distr of data
+                }
+
         ","
         "),"
 
-        ",ifelse(GPCM,"
+        ",ifelse(PCM,"
                 for (j in 1:n_items){
                     for (k in 1:Nk){
                         etadz[fam,j,k] <- pheno_dz[fam,1] - item_b[j,k]
@@ -224,6 +231,11 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                     } 
                 }
 
+
+                for (j in 1:(2*n_items)){
+                    data_dz[fam,j] ~ dcat(probdz[fam,j,1:Nk]) # multinomial distr of data
+                }
+
         ","
         "),"        
     }
@@ -237,15 +249,15 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     tau_c ~ dgamma(1,1)
     tau_a ~ dgamma(1,1)   
     
-    ",iflese(1PL,"
+    ",ifelse(PL_1,"
     for (j in 1:n_items){
       item_b[j] ~ dnorm(0,.1)
     }
     "," "),"
 
-    ",iflese(2PL,"
+    ",ifelse(PL_2,"
     alpha[1] <- 1 #fix first item to identify scale
-    for (j in 1:n_items){
+    for (j in 2:n_items){
        alpha[j] ~ dlnorm(0, .1)
     }
 
@@ -255,29 +267,29 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     "," "),"
     
     
-    ",iflese(GPCM,"
+    ",ifelse(GPCM,"
     alpha[1] <- 1
 
-    for (j in 1:n_items){
+    for (j in 2:n_items){
         alpha[j] ~ dlnorm(0, .1)
     }
 
-    for (j in 1:n.items){
-        beta [j,1] <- 0.0 #first threshold = 0
+    for (j in 1:n_items){
+        item_b[j,1] <- 0.0 #first threshold = 0
 	
 	    for (k in 2:Nk){
-	        beta [j,k] ~ dnorm (0, .1)
+	        item_b[j,k] ~ dnorm (0, .1)
 	    }
     }
 
     "," "),"
     
-    ",iflese(PCM,"
-    for (j in 1:n.items){
-        beta [j,1] <- 0.0 #first threshold = 0
+    ",ifelse(PCM,"
+    for (j in 1:n_items){
+        item_b[j,1] <- 0.0 #first threshold = 0
     
 	    for (k in 2:Nk){
-	        beta [j,k] ~ dnorm (0, .1)
+	        item_b[j,k] ~ dnorm (0, .1)
 	    }
     }
 
@@ -291,6 +303,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
 
     jags_file_irt <- tempfile(fileext=".txt")
     write(jags_model_irt,jags_file_irt)
+    #writeLines(jags_model_irt, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
@@ -298,14 +311,25 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     inits = list(tau_a = 2, tau_c = 5)
     jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
     names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
+    
+    if (PCM == TRUE || GPCM == TRUE){
+        jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, Nk)
+        names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk") 
+    }
+
     jags <- jags.model(jags_file_irt, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
     
-    if (ge == FALSE){
+    if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
         out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
+    } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
+        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b"), n_iter)
+    } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
+        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha"), n_iter)
     } else {
-        out <- jags.samples(jags, c("tau_a", "beta0", "beta1", "item_b"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha"), n_iter)
     }
+       
     
     #==========================================================
     # III. Organize results  
@@ -314,19 +338,23 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
         #Save samples
         samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
         samples_var_e = 1/out$tau_e[,,1]; samples_item_b = out$item_b[,,1]
+        if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
         
         #Calculate mean values: 
         var_a = mean(samples_var_a); var_c = mean(samples_var_c); var_e = mean(samples_var_e)
         item_b = apply(samples_item_b, 1, mean)
+        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate SDs: 
         sd_var_a = sd(samples_var_a); sd_var_c = sd(samples_var_c); sd_var_e = sd(samples_var_e)
         sd_item_b = apply(samples_item_b, 1, sd)
+        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate HPD: 
         hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_c = HPD(samples_var_c, 0.95)
         hpd_var_e = HPD(samples_var_e, 0.95); 
         hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
+        if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
         
         #Put results in a table 
         results = matrix(c(var_a, sd_var_a, var_c, sd_var_c, var_e, sd_var_e), 2, 3)
@@ -340,6 +368,13 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                       hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
                       hpd_item_b = hpd_item_b)
         
+        if(PL_2 == TRUE || GPCM == TRUE){
+        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                      samples_var_e = samples_var_e, samples_item_b = samples_item_b,
+                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
+                      hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha)
+        }
+        
         #Change class of objects in order to use right plot method 
         class(output) <- c("sumscores","list")    
         class(output$samples_var_a) <- "samples"
@@ -347,25 +382,31 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
         class(output$samples_var_e) <- "samples"
         class(output$samples_item_b) <- "samples"
         
+        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "samples"}
+        
     } else {
         #Save samples
         samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
         samples_beta0 = out$beta0[,,1]; samples_beta1 = out$beta1[,,1]; samples_item_b = out$item_b[,,1]
+        if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
         
         #Calculate mean values: 
         var_a = mean(samples_var_a); var_c = mean(samples_var_c)
         beta0 = mean(samples_beta0); beta1 = mean(samples_beta1)
         item_b = apply(samples_item_b, 1, mean)
+        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate SDs: 
         sd_var_a = sd(samples_var_a); sd_var_c = sd(samples_var_c)
         sd_beta0 = sd(samples_beta0); sd_beta1 = sd(samples_beta1)
         sd_item_b = apply(samples_item_b, 1, sd)
+        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate HPD: 
         hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_c = HPD(samples_var_c, 0.95)
         hpd_beta0 = HPD(samples_beta0, 0.95); hpd_beta1 = HPD(samples_beta1, 0.95)
         hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
+        if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
         
         #Put results in a table 
         results = matrix(c(var_a, sd_var_a, var_c, sd_var_c, beta0, sd_beta0, beta1, sd_beta1), 2, 4)
@@ -379,6 +420,14 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                       hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
                       hpd_item_b = hpd_item_b)
         
+        if(PL_2 == TRUE || GPCM == TRUE){
+            output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
+                          hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                          hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha)
+        }
+        
+        
         #Change class of objects in order to use right plot method 
         class(output) <- c("ge_irt","list")    
         class(output$samples_var_a) <- "samples"
@@ -386,6 +435,9 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
         class(output$samples_beta0) <- "samples"
         class(output$samples_beta1) <- "samples"     
         class(output$samples_item_b) <- "samples"
+        
+        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "samples"}
+        
     }
     
     return(output)
