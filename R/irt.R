@@ -11,11 +11,23 @@
 
 irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     
+    #Make boolean variable to create model string with the 
+    #right IRT model 
+    if (irt_model == "1PL"{
+        1PL = TRUE
+    } else if (irt_model = "2PL"){
+        2PL = TRUE
+    } else if (irt_model = "GPCM"){
+        GPCM = TRUE
+    } else {
+        PCM = TRUE
+    }
+    
     #Determine number of twin pairs
     n_mz <- nrow(data_mz) ; n_dz<- nrow(data_dz)
     
     # determine number of phenotypic items
-    n_var <- ncol(data_mz)/2
+    n_items <- ncol(data_mz)/2
     
     #==========================================================
     # I. Write JAGS model file
@@ -37,18 +49,90 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
             for (twin in 1:2){
                 pheno_mz[fam,twin] ~ dnorm(f_mz[fam],tau_e)   
             }"),"
-
+        ",ifelse(1PL,"
                 #1pl model twin1
-                for (k in 1:n_var){
-                    logit(p[fam,k]) <- pheno_mz[fam,1] - b[k]
-                    data_mz[fam,k] ~ dbern(p[fam,k])
+                for (j in 1:n_items){
+                    logit(p[fam,j]) <- pheno_mz[fam,1] - b[j]
+                    data_mz[fam,j] ~ dbern(p[fam,j])
                 }      	
     
                 #1pl model twin2
-                for (k in (n_var+1):(2*n_var)){
-                    logit(p[fam,k]) <- pheno_mz[fam,2] - b[k-n_var]
-                    data_mz[fam,k] ~ dbern(p[fam,k])
+                for (j in (n_items+1):(2*n_items)){
+                    logit(p[fam,j]) <- pheno_mz[fam,2] - b[j-n_items]
+                    data_mz[fam,j] ~ dbern(p[fam,j])
                 }
+        ","
+        "),"
+
+        ",ifelse(2PL,"
+                #2pl model twin1
+                for (j in 1:n_items){
+                    logit(p[fam,j]) <- alpha[j] * (pheno_mz[fam,1] - b[j])
+                    data_mz[fam,j] ~ dbern(p[fam,j])
+                }          
+    
+                #1pl model twin2
+                for (k in (n_items+1):(2*n_items)){
+                    logit(p[fam,j]) <- alpha[j] * (pheno_mz[fam,2] - b[j-n_items])
+                    data_mz[fam,j] ~ dbern(p[fam,j])
+                }
+        ","
+        "),"
+        
+        ",ifelse(GPCM,"
+    			#GPCM for twin 1
+                for (j in 1:n_items){
+					for (k in 1:Nk){
+						eta[fam,j,k] <- alpha[j] * (pheno_mz[fam,1] - item_b[j,k])
+                        psum [fam,j,k] <- sum(eta[i,j,1:k])
+                        exp.psum[fam,j,k] <- exp(psum[fam,j,k])
+                        prob [fam,j,k] <- exp.psum [fam,j,k]/sum(exp.psum[fam,j,1:Nk])
+                     } 
+				}
+                
+				#GPCM for twin 2
+				for (j in (n_items+1):(2*n_items)){
+					for (k in 1:3){
+						eta[i,j,k] <- alpha [j-n_items] * (pheno_mz[i,2] - item_b [j-n_items,k])
+                        psum[i,j,k] <- sum(eta[i,j,1: k])
+                        exp.psum [i,j,k] <- exp(psum[i,j,k])
+                        prob[i,j,k] <- exp.psum[i,j,k]/sum(exp.psum[i,j,1:Nk])
+                     } 
+				}
+                for (j in 1:(2*n_items)){
+                        data_mz[fam,j] ~ dcat(prob[fam,j,1:k]) # multinomial distr of data
+                }
+
+        ","
+        "),"
+
+        ",ifelse(PCM,"
+        		#PCM for twin 1
+                for (j in 1:n_items){
+					for (k in 1:Nk){
+						eta[fam,j,k] <- pheno_mz[fam,1] - item_b[j,k]
+                        psum [fam,j,k] <- sum(eta[i,j,1:k])
+                        exp.psum[fam,j,k] <- exp(psum[fam,j,k])
+                        prob [fam,j,k] <- exp.psum [fam,j,k]/sum(exp.psum[fam,j,1:Nk])
+                     } 
+				}
+                
+				#PCM for twin 2
+				for (j in (n_items+1):(2*n_items)){
+					for (k in 1:3){
+						eta[i,j,k] <- pheno_mz[i,2] - item_b [j-n_items,k]
+                        psum[i,j,k] <- sum(eta[i,j,1: k])
+                        exp.psum [i,j,k] <- exp(psum[i,j,k])
+                        prob[i,j,k] <- exp.psum[i,j,k]/sum(exp.psum[i,j,1:Nk])
+                     } 
+				}
+                for (j in 1:(2*n_items)){
+                        data_mz[fam,j] ~ dcat(prob[fam,j,1:k]) # multinomial distr of data
+                }
+
+        ","
+        "),"
+        
         }
     
         ##DZ twins
@@ -68,18 +152,81 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
                     pheno_dz[fam,twin] ~ dnorm(f_dz[fam,twin], tau_e)
                 }"),"
 
+
+        ",ifelse(1PL,"
                 #1pl model twin1 (DZ)
-                for (k in 1:n_var){
-                    logit(p2[fam,k]) <- pheno_dz[fam,1] - b[k]
-                    data_dz[fam,k] ~ dbern(p2[fam,k])
+                for (j in 1:n_items){
+                    logit(p2[fam,j]) <- pheno_dz[fam,1] - item_b[j]
+                    data_dz[fam,j] ~ dbern(p2[fam,j])
                 }
     
                 #1pl model twin2 (DZ)
-                for (k in (n_var+1):(2*n_var)){
-                    logit(p2[fam,k]) <- pheno_dz[fam,2] - b[k-n_var]
-                    data_dz[fam,k] ~ dbern(p2[fam,k])
+                for (j in (n_items+1):(2*n_items)){
+                    logit(p2[fam,j]) <- pheno_dz[fam,2] - item_b[j-n_items]
+                    data_dz[fam,j] ~ dbern(p2[fam,j])
                 }
-        }
+        ","
+        "),"
+
+
+        
+        ",ifelse(2PL,"
+                #2pl model twin1 (DZ)
+                for (j in 1:n_items){
+                    logit(p2[fam,j]) <- alpha[j]*(pheno_dz[fam,1] - item_b[j])
+                    data_dz[fam,j] ~ dbern(p2[fam,j])
+                }
+    
+                #2pl model twin2 (DZ)
+                for (j in (n_items+1):(2*n_items)){
+                    logit(p2[fam,j]) <- alpha[j]*(pheno_dz[fam,2] - item_b[j-n_items])
+                    data_dz[fam,j] ~ dbern(p2[fam,j])
+                }
+        ","
+        "),"
+
+        ",ifelse(GPCM,"
+                for (j in 1:n_items){
+                    for (k in 1:Nk){
+                        etadz[fam,j,k] <- alpha[j]*(pheno_dz[fam,1] - item_b[j,k])
+                        psumdz [fam,j,k] <- sum(etadz[fam,j,1:k])
+                        exp.psumdz[fam,j,k] <- exp(psumdz[fam,j,k])
+                        probdz[fam,j,k] <- exp.psumdz[fam,j,k]/sum(exp.psumdz[fam,j,1:Nk])
+                    } 
+                }
+                for (j in (n_items+1):(2*n_items)){
+                    for (k in 1:Nk){
+                        etadz[fam,j,k] <- alpha[j-n_items] * (pheno_dz[fam,2] - item_b[j-n_items,k])
+                        psumdz[fam,j,k] <- sum(etadz[fam,j,1: k])
+                        exp.psumdz[fam,j,k] <- exp(psumdz[fam,j,k])
+                        probdz[fam,j,k] <- exp.psumdz[fam,j,k]/sum(exp.psumdz[fam,j,1:Nk])
+                    } 
+                }
+
+        ","
+        "),"
+
+        ",ifelse(GPCM,"
+                for (j in 1:n_items){
+                    for (k in 1:Nk){
+                        etadz[fam,j,k] <- pheno_dz[fam,1] - item_b[j,k]
+                        psumdz [fam,j,k] <- sum(etadz[fam,j,1:k])
+                        exp.psumdz[fam,j,k] <- exp(psumdz[fam,j,k])
+                        probdz[fam,j,k] <- exp.psumdz[fam,j,k]/sum(exp.psumdz[fam,j,1:Nk])
+                    } 
+                }
+                for (j in (n_items+1):(2*n_items)){
+                    for (k in 1:Nk){
+                        etadz[fam,j,k] <- pheno_dz[fam,2] - item_b[j-n_items,k]
+                        psumdz[fam,j,k] <- sum(etadz[fam,j,1: k])
+                        exp.psumdz[fam,j,k] <- exp(psumdz[fam,j,k])
+                        probdz[fam,j,k] <- exp.psumdz[fam,j,k]/sum(exp.psumdz[fam,j,1:Nk])
+                    } 
+                }
+
+        ","
+        "),"        
+    }
     
     
     #Priors
@@ -89,10 +236,52 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     #Priors
     tau_c ~ dgamma(1,1)
     tau_a ~ dgamma(1,1)   
-
-    for (i in 1:n_var){
-      b[i] ~ dnorm(0,.1)
+    
+    ",iflese(1PL,"
+    for (j in 1:n_items){
+      item_b[j] ~ dnorm(0,.1)
     }
+    "," "),"
+
+    ",iflese(2PL,"
+    alpha[1] <- 1 #fix first item to identify scale
+    for (j in 1:n_items){
+       alpha[j] ~ dlnorm(0, .1)
+    }
+
+    for (j in 1:n_items){
+      item_b[j] ~ dnorm(0,.1)
+    }
+    "," "),"
+    
+    
+    ",iflese(GPCM,"
+    alpha[1] <- 1
+
+    for (j in 1:n_items){
+        alpha[j] ~ dlnorm(0, .1)
+    }
+
+    for (j in 1:n.items){
+        beta [j,1] <- 0.0 #first threshold = 0
+	
+	    for (k in 2:Nk){
+	        beta [j,k] ~ dnorm (0, .1)
+	    }
+    }
+
+    "," "),"
+    
+    ",iflese(PCM,"
+    for (j in 1:n.items){
+        beta [j,1] <- 0.0 #first threshold = 0
+    
+	    for (k in 2:Nk){
+	        beta [j,k] ~ dnorm (0, .1)
+	    }
+    }
+
+    "," "),"
 
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
@@ -107,15 +296,15 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     # II. Run JAGS analysis
     #==========================================================
     inits = list(tau_a = 2, tau_c = 5)
-    jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_var)
-    names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_var") 
+    jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
+    names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     jags <- jags.model(jags_file_irt, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
     
     if (ge == FALSE){
-        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "b"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
     } else {
-        out <- jags.samples(jags, c("tau_a", "beta0", "beta1", "b"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "beta0", "beta1", "item_b"), n_iter)
     }
     
     #==========================================================
@@ -124,15 +313,15 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     if(ge == FALSE){
         #Save samples
         samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
-        samples_var_e = 1/out$tau_e[,,1]; samples_item_b = out$b[,,1]
+        samples_var_e = 1/out$tau_e[,,1]; samples_item_b = out$item_b[,,1]
         
         #Calculate mean values: 
         var_a = mean(samples_var_a); var_c = mean(samples_var_c); var_e = mean(samples_var_e)
-        item_b = apply(out$b[,,1], 1, mean)
+        item_b = apply(samples_item_b, 1, mean)
         
         #Calculate SDs: 
         sd_var_a = sd(samples_var_a); sd_var_c = sd(samples_var_c); sd_var_e = sd(samples_var_e)
-        sd_item_b = apply(out$b[,,1], 1, sd)
+        sd_item_b = apply(samples_item_b, 1, sd)
         
         #Calculate HPD: 
         hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_c = HPD(samples_var_c, 0.95)
@@ -161,7 +350,7 @@ irt <- function(data_mz, data_dz, n_burnin, n_iter, ge){
     } else {
         #Save samples
         samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
-        samples_beta0 = out$beta0[,,1]; samples_beta1 = out$beta1[,,1]; samples_item_b = out$b[,,1]
+        samples_beta0 = out$beta0[,,1]; samples_beta1 = out$beta1[,,1]; samples_item_b = out$item_b[,,1]
         
         #Calculate mean values: 
         var_a = mean(samples_var_a); var_c = mean(samples_var_c)
