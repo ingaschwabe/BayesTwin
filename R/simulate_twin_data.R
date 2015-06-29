@@ -1,209 +1,65 @@
 #==========================================================
-# Simulation of twin data (ACE model), using sum scores
-# or item scores, optional with GxE and/or environmental 
-# covariates
+# Simulation of twin data under the AE/ADE or ACE model, using
+# sum  scores or item scores, optional with GxE and/or 
+# environmental covariates
 #==========================================================
 
-simulate_twin_data <- function(nmz, ndz, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-                               model = "ACE", n_items = 0, n_var = 0){
+#setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
+simulate_twin_data <- function(n_mz, n_dz, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
+                               model = "ACE", n_items = 0, n_var = 0, ge == FALSE, ge_beta0 = 
+                               log(0.5), ge_beta1 = 1.5){
     
-    #I. Simulate genetic additive effects and common shared env. effects for MZ twins: 
-    c_mz = rnorm(nmz, 0, sqrt(var_c)) 
-    a_mz <- rnorm(nmz, c_mz, sqrt(var_a)) 
-    
-    #II. Do the same for DZ twins: 
-    c_dz = rnorm(ndz, 0, sqrt(var_c)) 
-    a1_dz <- rnorm(ndz, c_dz, sqrt(0.5 * var_a)) 
-    a2_dz <- cbind(rnorm(ndz, a1_dz, sqrt(0.5 * var_a)),
-                   rnorm(ndz, a1_dz, sqrt(0.5 * var_a)))
-    
-    #Generate answers for each twin, ACE model
-    #When n_items > 0, generate item patterns according to an 1 PL Rasch model. 
-    if(n_items > 0 && n_var > 0){
-        ### I. MZ twins: 
-        #Simulate data for the betas
-        bp <- as.matrix(rnorm(n_items, 0,1))
-        bp_mz <- t(matrix(bp, n_items, nmz))
-        
-        #Simulate data for the coefficients: 
-        cov_mz = matrix(0, nmz, 2*n_var) #first 1:n_var col for twin 1, n_var+1 : 2*n_var col for twin 2
-        coefficients = runif(n_var, -2, 2)
-        beta = as.matrix(coefficients)
-        
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){ #Intercept! 
-                cov_mz[,i] = rep(1, nmz)
-            }else {cov_mz[,i]=rnorm(nmz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-        
-        #Generate answers for each twin: (phenotype data)
-        pheno_mz = matrix(NA, nmz, 2)
-        for (i in 1:nmz){
-            pheno_mz[i, 1] = rnorm(1, a_mz[i] + (cov_mz[i,1:n_var] %*% beta), sqrt(var_e))
-            pheno_mz[i, 2] = rnorm(1, a_mz[i] + (cov_mz[i,(n_var+1):(2*n_var)] %*% beta), sqrt(var_e))
-        }
-        
-        #cor(pheno_mz[,1], pheno_mz[,2]) #to check. must be ~ var_a + var_c
-        
-        #Trait values
-        traits_mz_twin1 <- matrix(pheno_mz[,1], nmz, n_items)
-        traits_mz_twin2 <- matrix(pheno_mz[,2], nmz, n_items)
-        
-        #Calculate p (simple Rasch model) for item data
-        p_mz_twin1 <- (exp(traits_mz_twin1-bp_mz))/(1+(exp(traits_mz_twin1-bp_mz)))#MZ twins
-        p_mz_twin2 <- (exp(traits_mz_twin2-bp_mz))/(1+(exp(traits_mz_twin2-bp_mz)))
-        mz_twin1_itemdata <- t(apply(p_mz_twin1, 1, function(x) rbinom (n_items, 1, x)))
-        mz_twin2_itemdata <- t(apply(p_mz_twin2, 1, function(x) rbinom (n_items, 1, x)))
-        
-        #Organize the data, suitable for MCMC analysis: 
-        y_mz <- matrix(0,nmz,(n_items*2))
-        y_mz[,1:(n_items)] <- mz_twin1_itemdata
-        y_mz[,(n_items+1):(n_items*2)] <- mz_twin2_itemdata
-        
-        ### II. DZ twins: 
-        cov_dz = matrix(0, ndz, 2*n_var)
-        
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){
-                cov_dz[,i] = rep(1, ndz)
-            }else {cov_dz[,i]=rnorm(ndz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-        
-        #Generate answers for each twin: 
-        pheno_dz = matrix(NA, ndz, 2)
-        for (i in 1:ndz){
-            pheno_dz[i,1] = rnorm(1, a2_dz[i,1] + (cov_dz[i,1:n_var] %*% beta), sqrt(var_e))
-            pheno_dz[i,2] = rnorm(1, a2_dz[i,2] + (cov_dz[i,(n_var+1):(2*n_var)] %*% beta) , sqrt(var_e))
-        }
-        
-        #cor(pheno_dz[,1], pheno_dz[,2]) #to check, must be ~0.5*var_a + var_c
-        
-        bp_dz <- t(matrix(bp, n_items, ndz))
-        
-        #Trait values
-        traits_dz_twin1 <- matrix(pheno_dz[,1], ndz, n_items)#DZ twins
-        traits_dz_twin2 <- matrix(pheno_dz[,2], ndz, n_items)
-        
-        #Calculate p (simple Rasch model) for item data
-        p_dz_twin1 <- (exp(traits_dz_twin1-bp_dz))/(1+(exp(traits_dz_twin1-bp_dz)))
-        p_dz_twin2 <- (exp(traits_dz_twin2-bp_dz))/(1+(exp(traits_dz_twin2-bp_dz)))
-        dz_twin1_itemdata <- t(apply(p_dz_twin1, 1, function(x) rbinom (n_items, 1, x))) 
-        dz_twin2_itemdata <- t(apply(p_dz_twin2, 1, function(x) rbinom (n_items, 1, x)))
-        
-        #Organize the data, suitable for MCMC analysis: 
-        y_dz <- matrix(0,ndz,(n_items*2))
-        y_dz[,1:(n_items)] <- dz_twin1_itemdata
-        y_dz[,(n_items+1):(n_items*2)] <- dz_twin2_itemdata
-        
-    } else if (n_items > 0 && n_var == 0) {
-        ### I. MZ twins: 
-        #Simulate data for the betas
-        bp <- as.matrix(rnorm(n_items, 0,1))
-        bp_mz <- t(matrix(bp, n_items, nmz))    
-        
-        #Phenotype data: 
-        pheno_mz = cbind(rnorm(nmz, a_mz, sqrt(var_e)), 
-                         rnorm(nmz, a_mz, sqrt(var_e)))
-        
-        #cor(pheno_mz[,1], pheno_mz[,2]) #to check. must be ~ var_a + var_c
-        
-        #Trait values
-        traits_mz_twin1 <- matrix(pheno_mz[,1], nmz, n_items)
-        traits_mz_twin2 <- matrix(pheno_mz[,2], nmz, n_items)
-        
-        #Calculate p (simple Rasch model) for item data
-        p_mz_twin1 <- (exp(traits_mz_twin1-bp_mz))/(1+(exp(traits_mz_twin1-bp_mz)))#MZ twins
-        p_mz_twin2 <- (exp(traits_mz_twin2-bp_mz))/(1+(exp(traits_mz_twin2-bp_mz)))
-        mz_twin1_itemdata <- t(apply(p_mz_twin1, 1, function(x) rbinom (n_items, 1, x)))
-        mz_twin2_itemdata <- t(apply(p_mz_twin2, 1, function(x) rbinom (n_items, 1, x)))
-        
-        #Organize the data, suitable for MCMC analysis: 
-        y_mz <- matrix(0,nmz,(n_items*2))
-        y_mz[,1:(n_items)] <- mz_twin1_itemdata
-        y_mz[,(n_items+1):(n_items*2)] <- mz_twin2_itemdata
-        
-        ### II. DZ twins: 
-        pheno_dz = cbind(rnorm(ndz, a2_dz[,1], sqrt(var_e)),
-                         rnorm(ndz, a2_dz[,2], sqrt(var_e)))
-        
-        #cor(pheno_dz[,1], pheno_dz[,2]) #to check, must be ~0.5*var_a + var_c
-        
-        bp_dz <- t(matrix(bp, n_items, ndz))
-        
-        #Trait values
-        traits_dz_twin1 <- matrix(pheno_dz[,1], ndz, n_items)#DZ twins
-        traits_dz_twin2 <- matrix(pheno_dz[,2], ndz, n_items)
-        
-        #Calculate p (simple Rasch model) for item data
-        p_dz_twin1 <- (exp(traits_dz_twin1-bp_dz))/(1+(exp(traits_dz_twin1-bp_dz)))
-        p_dz_twin2 <- (exp(traits_dz_twin2-bp_dz))/(1+(exp(traits_dz_twin2-bp_dz)))
-        dz_twin1_itemdata <- t(apply(p_dz_twin1, 1, function(x) rbinom (n_items, 1, x))) 
-        dz_twin2_itemdata <- t(apply(p_dz_twin2, 1, function(x) rbinom (n_items, 1, x)))
-        
-        #Organize the data, suitable for MCMC analysis: 
-        y_dz <- matrix(0,ndz,(n_items*2))
-        y_dz[,1:(n_items)] <- dz_twin1_itemdata
-        y_dz[,(n_items+1):(n_items*2)] <- dz_twin2_itemdata
-        
-    } else if (n_items == 0 && n_var > 0){
-        ### I.MZ twins
-        #Simulate data for the coefficients: 
-        cov_mz = matrix(0, nmz, 2*n_var) #first 1:n_var col for twin 1, n_var+1 : 2*n_var col for twin 2
-        coefficients = runif(n_var, -2, 2)
-        beta = as.matrix(coefficients)
-        
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){ #Intercept! 
-                cov_mz[,i] = rep(1, nmz)
-            }else {cov_mz[,i]=rnorm(nmz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-        
-        #Generate answers for each twin: (phenotype data)
-        y_mz = matrix(NA, nmz, 2)
-        for (i in 1:nmz){
-            y_mz[i, 1] = rnorm(1, a_mz[i] + (cov_mz[i,1:n_var] %*% beta), sqrt(var_e))
-            y_mz[i, 2] = rnorm(1, a_mz[i] + (cov_mz[i,(n_var+1):(2*n_var)] %*% beta), sqrt(var_e))
-        }
-        
-        #cor(pheno_mz[,1], pheno_mz[,2]) #to check. must be ~ var_a + var_c
-        
-        ### II.DZ twins
-        cov_dz = matrix(0, ndz, 2*n_var)
-        
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){
-                cov_dz[,i] = rep(1, ndz)
-            }else {cov_dz[,i]=rnorm(ndz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-        
-        #Generate answers for each twin: 
-        y_dz = matrix(NA, ndz, 2)
-        for (i in 1:ndz){
-            y_dz[i,1] = rnorm(1, a2_dz[i,1] + (cov_dz[i,1:n_var] %*% beta), sqrt(var_e))
-            y_dz[i,2] = rnorm(1, a2_dz[i,2] + (cov_dz[i,(n_var+1):(2*n_var)] %*% beta) , sqrt(var_e))
-        }
-        
-    }   else { 
-        ### I. MZ twins: 
-        y_mz = cbind(rnorm(nmz, a_mz,  sqrt(var_e)), 
-                     rnorm(nmz, a_mz, sqrt(var_e)))
-        
-        ### II. DZ twins: 
-        y_dz = cbind(rnorm(ndz, a2_dz[,1], sqrt(var_e)),
-                     rnorm(ndz, a2_dz[,2], sqrt(var_e)))
-        
-        #cor(y_mz[,1], y_mz[,2]) #to check. must be ~ var_a + var_c
-        #cor(y_dz[,1], y_dz[,2]) #to check, must be ~ 0.5*var_a + var_c
+    #==========================================================
+    # Error messages
+    #==========================================================
+    if (ge == TRUE && ge_beta0 = 0){
+        cat("Warning: \n
+             Please specify a value for beta0 when simulating data with genotype by environment interaction. \n
+             The parameter beta0 is defined as average environmental variance (i.e., when A = 0) \n
+             For more information see Schwabe & van den Berg (2014), Behavior Genetics, 44 (4), 394-406")
     }
     
+    if (var_d > 0 && var_c > 0){
+        cat("Warning: \n
+             You cannot specify variance due to shared-environmental effects (C) and variance due to 
+             dominance effects (D) at the same time. This model is not identified! \n
+             Depending on your model-choice (ACE/ADE),
+             either var_c or var_d is used for the data simulation")
+    }
     
-    if(n_var > 0){return_list = list(y_mz = y_mz, y_dz = y_dz, cov_mz = cov_mz[,c(2:n_var, (n_var + 2):(2*n_var))], 
-                                     cov_dz = cov_dz[,c(2:n_var, (n_var + 2):(2*n_var))])
-    } else {return_list = list(y_mz = y_mz, y_dz = y_dz)}
+    if(n_dz == 0){
+        cat("Warning: \n
+            Unless you want to simulate data under the AE model, please chose a total number of DZ twins above 0.")
+    }
     
-    return(return_list)
-}#end function simulate_twin_data
+    if(n_mz == 0){
+        cat("Warning: \n
+            You specified a total number of MZ twins of 0. This won't work! Please choose a number above 0.")
+    }
+    #==========================================================
+    
+    #==========================================================
+    # Data simulation ACE,ADE,AE:
+    #==========================================================
+    if(model == "ACE"){
+        print("Simulating data under an ACE model...")
+        source("simulate_ACE.R")
+        output = simulate_ACE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_c = var_c, 
+                              var_e = var_e, n_items = n_items, n_var = n_var, ge = ge,
+                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+    } else if (model == "ADE"){
+        print("Simulating data under an ADE model...")
+        source("simulate_ADE.R")
+        output = simulate_ADE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_d = var_d, 
+                              var_e = var_e, n_items = n_items, n_var = n_var, ge = ge,
+                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+    } else {
+        print("Simulating data under an AE model...")
+        source("simulate_AE.R")
+        output = simulate_AE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_e = var_e, 
+                             n_items = n_items, n_var = n_var, ge = ge,
+                             ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+    }
+    #==========================================================
+    return(output)    
+}
