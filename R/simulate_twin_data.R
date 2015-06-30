@@ -6,25 +6,37 @@
 
 #setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 simulate_twin_data <- function(n_mz, n_dz, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
-                               model = "ACE", n_items = 0, n_var = 0, ge = FALSE, ge_beta0 = 
+                               model = "ACE", n_items = 20, n_var = 0, ge = FALSE, ge_beta0 = 
                                log(0.5), ge_beta1 = 1.5){
     
     #==========================================================
     # Error messages
-    #==========================================================
+    #==========================================================    
+    if(n_items < 0){
+        cat("Error: \n
+             The number of test items is negative. Something went wrong here!")
+    }
+    
+    
+    if(n_items == 0){
+        cat("Error: \n
+             The number of test items used for the simulation is equal to 0. Without any items, the
+             twin data cannot be simulated!")
+    }
+    
     if (ge == TRUE && ge_beta0 == 0){
-        cat("Warning: \n
-             Please specify a value for beta0 when simulating data with genotype by environment interaction.
-             The parameter beta0 is defined as average environmental variance (i.e., when A = 0) 
-             For more information see Schwabe & van den Berg (2014), Behavior Genetics, 44 (4), 394-406.")
+        cat("Error: \n
+                Please specify a value for beta0 when simulating data with genotype by environment interaction.
+                The parameter beta0 is defined as average environmental variance (i.e., when A = 0) 
+                For more information see Schwabe & van den Berg (2014), Behavior Genetics, 44 (4), 394-406.")
     }
     
     if (var_d > 0 && var_c > 0){
         cat("Warning: \n 
-             You cannot specify variance due to shared-environmental effects (C) and variance due to 
-             dominance effects (D) at the same time. This model is not identified! \n
-             Depending on your model-choice (ACE/ADE),
-             either var_c or var_d is used for the data simulation.")
+                You cannot specify variance due to shared-environmental effects (C) and variance due to 
+                dominance effects (D) at the same time. This model is not identified! \n
+                Depending on your model-choice (ACE/ADE),
+                either var_c or var_d is used for the data simulation.")
     }
     
     if(n_dz == 0){
@@ -33,7 +45,7 @@ simulate_twin_data <- function(n_mz, n_dz, var_a = 0.5, var_c = 0.3,  var_e = 0.
     }
     
     if(n_mz == 0){
-        cat("Warning: \n
+        cat("Error: \n
                 You specified a total number of MZ twins of 0. This won't work! Please choose a number above 0.")
     }
     #==========================================================
