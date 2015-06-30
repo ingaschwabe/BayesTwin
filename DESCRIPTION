@@ -16,5 +16,7 @@ Depends:
     coda,
     KernSmooth,
     xtable
-Description: Bayesian analysis of twin data (ACE/ADE model), also on the latent niveau on basis of an 1 PL Rasch model.
+Description: Bayesian analysis of twin data under the AE, ACE or ADE model.
+Analysis can be done using some scores but also on the item level, using an item response theory
+(IRT) model (1 PL, 2 PL or (G)PCM)
 License: GPL-2
