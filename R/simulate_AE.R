@@ -3,7 +3,6 @@
 # Simulation of twin data under the AE model 
 # Subroutine for simulate_twin_data.R
 #==========================================================
-
 simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
                         n_items, n_var, ge, ge_beta0, ge_beta1){
 
@@ -19,7 +18,8 @@ simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
     if(ge == TRUE){
         var_e_mz = exp(ge_beta0 + (ge_beta1 * a_mz))
         var_e_dz_twin1 = exp(ge_beta0 + (ge_beta1 * a2_dz[,1]))
-        var_e_dz_twin2 = exp(ge_beta0 + (ge_beta1 * a2_dz[,2]))        
+        var_e_dz_twin2 = exp(ge_beta0 + (ge_beta1 * a2_dz[,2]))     
+        print("Simulating model with GxE interaction...")
     } else {
         #In case of no GE:
         var_e_mz = var_e
