@@ -34,7 +34,7 @@ twinUniv = function(data_mz, data_dz,
     } else {itemdata = TRUE}
     
     #When data_imputation = FALSE, use only complete cases: 
-    if(is.na(twin1_datacols_cov) && data_imputation = FALSE){
+    if(is.na(twin1_datacols_cov) && data_imputation == FALSE){
         data_mz = na.omit(data_mz)
         data_dz = na.omit(data_dz)
     }
@@ -104,10 +104,10 @@ twinUniv = function(data_mz, data_dz,
         data_dz = data_dz[without_missings[,ncol(data_dz)],] 
         
         #Select only covariate data on basis of new dataset without missings: 
-        X_mz_twin1 = data_mz[,twin1_datacols_cov])
-        X_mz_twin2 = data_mz[,twin2_datacols_cov])
-        X_dz_twin1 = data_dz[,twin1_datacols_cov])
-        X_dz_twin2 = data_dz[,twin2_datacols_cov])
+        X_mz_twin1 = data_mz[,twin1_datacols_cov]
+        X_mz_twin2 = data_mz[,twin2_datacols_cov]
+        X_dz_twin1 = data_dz[,twin1_datacols_cov]
+        X_dz_twin2 = data_dz[,twin2_datacols_cov]
         covariates = TRUE
     
     } else {covariates = FALSE}
@@ -128,7 +128,7 @@ twinUniv = function(data_mz, data_dz,
                                X_mz_twin1 = X_mz_twin1, X_mz_twin2 = X_mz_twin2,
                                X_dz_twin1 = X_dz_twin1, X_dz_twin2 = X_dz_twin2,
                                dich_cov = dich_cov, cont_cov = cont_cov, 
-                               n_burnin = n_burnin, n_iter = n_iter
+                               n_burnin = n_burnin, n_iter = n_iter,
                                ge = ge, dich = dich) 
     }
     
@@ -214,7 +214,7 @@ twinUniv = function(data_mz, data_dz,
     #==========================================================
     # Output
     #==========================================================
-    source("plot.samples.R") #load method for generic function (hoeft later niet meer)
+    #source("plot.samples.R") #load method for generic function (hoeft later niet meer)
     
     #Remind user of convergence-issue
     cat("\n Here give some advice over convergence")
