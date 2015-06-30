@@ -1,86 +1,43 @@
 \name{simulate_twin_data}
-\alias{simulate_twin_data}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Simulation of twin data
-%%  ~~function to do ... ~~
-}
+\title{Simulate twin data}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-This function simulates twin data on basis of the ACE or ADE (coming in the future) model (Jinks & Fulker, 1970). It can be use to simulate single responses (sumscores), but also to simuulate item data. Item data is simulated on basis of the 1PL Rasch model (Rasch, 1960). Answers to covariates can be simulated as well. 
+  Simulation of item twin data under the AE, ACE or ADE model.
+  Optional with genotype by environment interaction (GxE) and/or environmental covariates.
 }
 \usage{
-simulate_twin_data(nmz, ndz, 
-                   var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-                   model = "ACE", n_items = 0, n_var = 0)
+simulate_twin_data(n_mz, n_dz, var_a = 0.5, var_c = 0.3, 
+var_e = 0.2, var_d = 0, model = "ACE", n_items = 0, n_var = 0, 
+ge = FALSE, ge_beta0 = log(0.5), ge_beta1 = 1.5)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nmz}{a numeric value, total number of MZ twins}
-  \item{ndz}{a numeric value, total number of DZ twins}
-  \item{var_a}{a numeric value, variance due to genetic effects. 
-               Defaults to 0.5}
-  \item{var_c}{a numeric value, variance due to shared-environmental effects. 
-               Defaults to 0.3}
-  \item{var_e}{a numeric value, variance due to unique-environmental effects. 
-               Defaults to 0.2}
-  \item{model}{specify the twin model that is used. 
-               At this moment only "ACE" available. "ADE" coming in the future}
-  \item{n_items}{numeric value, number of items when item data is simulated. Defaults to 0}
-  \item{n_var}{numeric value, number of covariates that are simulated. Defaults to 0}
+  \item{n_mz}{Number of monozygotic (MZ) twin pairs}
+  \item{n_dz}{Number of dizygotic (DZ) twin pairs}
+  \item{var_a}{Variance explained by additive genetic influences. Default value is 0.5.}
+  \item{var_c}{Variance explained by shared environmental influences. Default value is 0.3.}
+  \item{var_e}{Variance explained by unique environmental influences. Default value is 0.2.}
+  \item{var_d}{Variance explained by dominance genetic influences. As the default model is an "ACE""
+  model, the default value is set to 0.}
+  \item{model}{Biometric model used for the simulation. Default model is "ACE" model.}
+  \item{n_items}{Number of test items. When set above 0, 
+
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+  For each parameter the interval is constructed from the empirical cdf
+  of the sample as the shortest interval for which the difference in
+  the ecdf values of the endpoints is the nominal probability.  Assuming
+  that the distribution is not severely multimodal, this is the HPD interval.
 }
 \value{
-\item{y_mz}{
-A matrix of nmz rows and 2 columns with the answers of all MZ twins. Answers of twin 1 in the first column, answers of twin 2 in the second column. 
-
-When item data is simulated for a total of k items, the result is a matrix of nmz rows for the i-th MZ family and 2 columns of k items for twin 1 [1:k] and twin 2 [k+1:2*k] For example, y_mz[1,22] is the response of 
-MZ twin 1 from family 1 to item 22 and y_mz[1,23] is the response of MZ twin 2 from family 1 to item 1 if n_items = 22
+  For an \code{"mcmc"} object, a matrix with columns \code{"lower"} and
+  \code{"upper"} and rows corresponding to the parameters.  The
+  attribute \code{"Probability"} is the nominal probability content of
+  the intervals.  A list of such matrices is returned for an
+  \code{"mcmc.list"} object.
 }
-\item{y_dz}{
-A matrix with the answers of all DZ twins. Results are in the same structure as for y_mz
-}
-
-\item{cov_mz}{
-Responses of all MZ twins to covariates. A matrix of nmz rows and n_var columns. 
-}
-
-\item{cov_dz}{
-Responses of all MZ twins to covariates. A matrix of nmz rows and n_var columns. 
-}
-
-\references{
-}
-
-\author{
-Inga Schwabe <i.schwabe@utwente.nl>, Stephanie M. van den Berg
-}
-
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-\code{\link{ace_decomp}}
-}
-
+\author{Douglas Bates}
 \examples{
-
-\dontrun{
-
-#Generate data of 300 MZ twins and 500 DZ twins to 5 covariates
-simulate_twin_data(nmz = 300, ndz = 500, n_var = 5)
-
-#Generate data of 300 MZ twins and 500 DZ twins to 50 items
-simulate_twin_data(nmz = 300, ndz = 500, n_items = 50)
-
+data(line)
+HPDinterval(line)
 }
-
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{}
-\keyword{}% __ONLY ONE__ keyword per line
+\keyword{univar}
+\keyword{htest}
