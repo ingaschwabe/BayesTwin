@@ -29,7 +29,7 @@ simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
 
     #Generate answers for each twin, ACE model
     #When n_items > 0, generate item patterns according to an 1 PL Rasch model. 
-    if(n_items > 0 && n_var > 0){
+    if(n_var > 0){
         ### I. MZ twins: 
         #Simulate data for the betas
         bp <- as.matrix(rnorm(n_items, 0,1))
@@ -106,7 +106,7 @@ simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
         y_dz[,1:(n_items)] <- dz_twin1_itemdata
         y_dz[,(n_items+1):(n_items*2)] <- dz_twin2_itemdata
     
-    } else if (n_items > 0 && n_var == 0) {
+    } else {
         ### I. MZ twins: 
         #Simulate data for the betas
         bp <- as.matrix(rnorm(n_items, 0,1))
@@ -155,62 +155,11 @@ simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
         y_dz[,1:(n_items)] <- dz_twin1_itemdata
         y_dz[,(n_items+1):(n_items*2)] <- dz_twin2_itemdata
     
-    } else if (n_items == 0 && n_var > 0){
-        ### I.MZ twins
-        #Simulate data for the coefficients: 
-        cov_mz = matrix(0, n_mz, 2*n_var) #first 1:n_var col for twin 1, n_var+1 : 2*n_var col for twin 2
-        coefficients = runif(n_var, -2, 2)
-        beta = as.matrix(coefficients)
+    }  
     
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){ #Intercept! 
-                cov_mz[,i] = rep(1, n_mz)
-            }else {cov_mz[,i]=rnorm(n_mz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-    
-        #Generate answers for each twin: (phenotype data)
-        y_mz = matrix(NA, n_mz, 2)
-        for (i in 1:n_mz){
-            y_mz[i, 1] = rnorm(1, a_mz[i] + (cov_mz[i,1:n_var] %*% beta), sqrt(var_e_mz))
-            y_mz[i, 2] = rnorm(1, a_mz[i] + (cov_mz[i,(n_var+1):(2*n_var)] %*% beta), sqrt(var_e_mz))
-        }
-    
-        #cor(pheno_mz[,1], pheno_mz[,2]) #to check. must be ~ var_a + var_c
-    
-        ### II.DZ twins
-        cov_dz = matrix(0, n_dz, 2*n_var)
-    
-        #Generate answers to covariates: 
-        for (i in 1:(2*n_var)){
-            if(i == 1 || i == (n_var+1)){
-                cov_dz[,i] = rep(1, n_dz)
-            }else {cov_dz[,i]=rnorm(n_dz,0,1)} #rest of the colomns are answers to covariates. 
-        }
-    
-        #Generate answers for each twin: 
-        y_dz = matrix(NA, n_dz, 2)
-        for (i in 1:n_dz){
-            y_dz[i,1] = rnorm(1, a2_dz[i,1] + (cov_dz[i,1:n_var] %*% beta), sqrt(var_e_dz_twin1))
-            y_dz[i,2] = rnorm(1, a2_dz[i,2] + (cov_dz[i,(n_var+1):(2*n_var)] %*% beta) , sqrt(var_e_dz_twin2))
-        }
-    
-    }   else { 
-        ### I. MZ twins: 
-        y_mz = cbind(rnorm(n_mz, a_mz,  sqrt(var_e_mz)), 
-                     rnorm(n_mz, a_mz, sqrt(var_e_mz)))
-    
-        ### II. DZ twins: 
-        y_dz = cbind(rnorm(n_dz, a2_dz[,1], sqrt(var_e_dz_twin1)),
-                     rnorm(n_dz, a2_dz[,2], sqrt(var_e_dz_twin2)))
-    
-        #cor(y_mz[,1], y_mz[,2]) #to check. must be ~ var_a + var_c
-        #cor(y_dz[,1], y_dz[,2]) #to check, must be ~ 0.5*var_a + var_c
+    if(n_var > 0){return_list = list(y_mz = y_mz, y_dz = y_dz, cov_mz = cov_mz[,c(2:n_var, (n_var + 2):(2*n_var))], 
+                                     cov_dz = cov_dz[,c(2:n_var, (n_var + 2):(2*n_var))])
+    } else {return_list = list(y_mz = y_mz, y_dz = y_dz)}
         
-        if(n_var > 0){return_list = list(y_mz = y_mz, y_dz = y_dz, cov_mz = cov_mz[,c(2:n_var, (n_var + 2):(2*n_var))], 
-                                         cov_dz = cov_dz[,c(2:n_var, (n_var + 2):(2*n_var))])
-        } else {return_list = list(y_mz = y_mz, y_dz = y_dz)}
-        
-        return(return_list)
-        }
+    return(return_list)
 }
