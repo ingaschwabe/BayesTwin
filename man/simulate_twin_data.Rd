@@ -15,7 +15,7 @@ ge = FALSE, ge_beta0 = log(0.5), ge_beta1 = 1.5)
   \item{var_a}{Variance explained by additive genetic influences. Default value is 0.5.}
   \item{var_c}{Variance explained by shared environmental influences. Default value is 0.3.}
   \item{var_e}{Variance explained by unique environmental influences. Default value is 0.2.}
-  \item{var_d}{Variance explained by dominance genetic influences. As the default model is an "ACE""
+  \item{var_d}{Variance explained by dominance genetic influences. As the default model is an "ACE"
   model, the default value is set to 0.}
   \item{model}{Biometric model used for the simulation. Default model is "ACE" model.}
   \item{n_items}{Number of test items. Default value is 20.}
