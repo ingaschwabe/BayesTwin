@@ -25,7 +25,8 @@ simulate_ADE = function(n_mz, n_dz, var_a, var_d,  var_e,
     if(ge == TRUE){
         var_e_mz = exp(ge_beta0 + (ge_beta1 * g_mz))
         var_e_dz_twin1 = exp(ge_beta0 + (ge_beta1 * g2[,1]))
-        var_e_dz_twin2 = exp(ge_beta0 + (ge_beta1 * g2[,2]))        
+        var_e_dz_twin2 = exp(ge_beta0 + (ge_beta1 * g2[,2]))   
+        print("Simulating model with GxE interaction...")
     } else {
         #In case of no GE:
         var_e_mz = var_e
