@@ -1,5 +1,6 @@
 #==========================================================
-# S3 Method for the generic plot function 
+# plot.samples.R
+# S3 Method for the generic plot function
 # to plot sampling plots and histograms of posterior dist. 
 # BayesTwin package
 #==========================================================

@@ -1,6 +1,6 @@
 #==========================================================
-# irt_ade.R
-# Subroutine for the master function twinUniv()
+# irt_ace.R
+# Subroutine for master function twinUniv()
 #
 # Analysis of twin data under the ACE model using item data
 # Possible IRT models: 1PL, 2PL, GPCM, PCM
@@ -13,7 +13,7 @@
 # BayesTwin package
 #==========================================================
 
-irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
+irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -40,21 +40,22 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     #==========================================================
     # I. Write JAGS model file
     #==========================================================
-    jags_model_irt_ade <- paste("model{
+    jags_model_irt_ace <- paste("model{
         ##MZ twins
         for (fam in 1:n_mz){
-            a_mz[fam] ~ dnorm(mu, tau_a) 
-            g_mz[fam] ~ dnorm(a_mz[fam], tau_d)    
+            c_mz[fam] ~ dnorm(mu, tau_c)
+            f_mz[fam] ~ dnorm(c_mz[fam], tau_a) 
+          
         ",ifelse(ge,"
-            tau_e_mz[fam] <- 1/(exp(beta0+beta1*g_mz[fam])) #GxE on the whole genotype
+            a_mz[fam] <- f_mz[fam] - c_mz[fam]
+            tau_e[fam] <- 1/(exp(beta0 + (beta1*a_mz[fam])))
             
             for (twin in 1:2){
-                pheno_mz[fam,twin] ~ dnorm(g_mz[fam], tau_e_mz[fam])
-
+                pheno_mz[fam,twin] ~ dnorm(f_mz[fam],tau_e[fam])   
             }
         ","
             for (twin in 1:2){
-                pheno_mz[fam,twin] ~ dnorm(g_mz[fam],tau_e)   
+                pheno_mz[fam,twin] ~ dnorm(f_mz[fam],tau_e)   
             }"),"
         ",ifelse(PL_1,"
                 #1pl model twin1
@@ -144,25 +145,19 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     
         ##DZ twins
         for (fam in 1:n_dz){
-            #Between VAR
-    	    a_dz[fam] ~ dnorm(mu, double_tau_a)
-	    	g_dz[fam] ~ dnorm(a_dz[fam], quarter_tau_d)
-		
-		    #Within VAR
-		    g1[fam,1] ~ dnorm(g_dz[fam], double_tau_a)
-		    g1[fam,2] ~ dnorm(g_dz[fam], double_tau_a)
-		
-	    	g2[fam,1] ~ dnorm(g1[fam,1], four_third_tau_d)
-		    g2[fam,2] ~ dnorm(g1[fam,2], four_third_tau_d)	
-
+            c_dz[fam] ~ dnorm(mu, tau_c)
+            f0_dz[fam] ~ dnorm(c_dz[fam], doubletau_a)
     
         ",ifelse(ge,"
                 for (twin in 1:2){            							
-                    tau_e_dz[fam,twin] <- 1/(exp(beta0+beta1*g2[fam,twin]))
-                    pheno_dz[fam,twin] ~ dnorm(g2[fam,twin], tau_e_dz[fam,twin])
+                    f_dz[fam,twin] ~ dnorm(f0_dz[fam], doubletau_a)
+                    a_dz[fam,twin] <- f_dz[fam,twin] - c_dz[fam]
+                    tau_e_dz[fam,twin] <- 1/(exp(beta0 + (beta1*a_dz[fam,twin])))
+                    pheno_dz[fam,twin] ~ dnorm(f_dz[fam,twin], tau_e_dz[fam,twin])
                 }","
                 for (twin in 1:2){										
-                    pheno_dz[fam,twin] ~ dnorm(g2[fam,twin], tau_e)
+                    f_dz[fam,twin] ~ dnorm(f0_dz[fam], doubletau_a)
+                    pheno_dz[fam,twin] ~ dnorm(f_dz[fam,twin], tau_e)
                 }"),"
 
 
@@ -252,14 +247,10 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     
     #Priors
     mu <- 0 #to identify scale 
-
-    #Genetic relations: 
-    double_tau_a <- 2*tau_a
-    quarter_tau_d <- 4 * tau_d
-    four_third_tau_d <- 4/3 * tau_d
+    doubletau_a <- 2*tau_a
 
     #Priors
-    tau_d ~ dgamma(1,1)
+    tau_c ~ dgamma(1,1)
     tau_a ~ dgamma(1,1)   
     
     ",ifelse(PL_1,"
@@ -314,14 +305,14 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     "tau_e ~ dgamma(1,1)"),"
     }")
 
-    jags_file_irt_ade <- tempfile(fileext=".txt")
-    write(jags_model_irt_ade,jags_file_irt_ade)
+    jags_file_irt_ace <- tempfile(fileext=".txt")
+    write(jags_model_irt_ace,jags_file_irt_ace)
     #writeLines(jags_model_irt, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================
-    inits = list(tau_a = 2, tau_d = 5)
+    inits = list(tau_a = 2, tau_c = 5)
     jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
     names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     
@@ -330,17 +321,17 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk") 
     }
 
-    jags <- jags.model(jags_file_irt_ade, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
     
     if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
     } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b"), n_iter)
     } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b", "alpha"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha"), n_iter)
     } else {
-        out <- jags.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b", "alpha"), n_iter)
+        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha"), n_iter)
     }
        
     
@@ -349,49 +340,49 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     #==========================================================
     if(ge == FALSE){
         #Save samples
-        samples_var_a = 1/out$tau_a[,,1]; samples_var_d = 1/out$tau_c[,,1]
+        samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
         samples_var_e = 1/out$tau_e[,,1]; samples_item_b = out$item_b[,,1]
         if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
         
         #Calculate mean values: 
-        var_a = mean(samples_var_a); var_d = mean(samples_var_d); var_e = mean(samples_var_e)
+        var_a = mean(samples_var_a); var_c = mean(samples_var_c); var_e = mean(samples_var_e)
         item_b = apply(samples_item_b, 1, mean)
         if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate SDs: 
-        sd_var_a = sd(samples_var_a); sd_var_d = sd(samples_var_d); sd_var_e = sd(samples_var_e)
+        sd_var_a = sd(samples_var_a); sd_var_c = sd(samples_var_c); sd_var_e = sd(samples_var_e)
         sd_item_b = apply(samples_item_b, 1, sd)
         if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate HPD: 
-        hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_d = HPD(samples_var_d, 0.95)
+        hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_c = HPD(samples_var_c, 0.95)
         hpd_var_e = HPD(samples_var_e, 0.95); 
         hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
         if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
         
         #Put results in a table 
-        results = matrix(c(var_a, sd_var_a, var_d, sd_var_d, var_e, sd_var_e), 2, 3)
-        colnames(results) <- c("varA","varD","varE")
+        results = matrix(c(var_a, sd_var_a, var_c, sd_var_c, var_e, sd_var_e), 2, 3)
+        colnames(results) <- c("varA","varC","varE")
         rownames(results) <- c("Posterior mean","Posterior standard deviation")
         results = as.table(results) 
         
         #And save output in a list: 
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_d = samples_var_d, 
+        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                       samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_d = hpd_var_d, hpd_var_e = hpd_var_e, 
+                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
                       hpd_item_b = hpd_item_b)
         
         if(PL_2 == TRUE || GPCM == TRUE){
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_d = samples_var_d, 
+        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                       samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_d = hpd_var_d, hpd_var_e = hpd_var_e, 
+                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
                       hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha)
         }
         
         #Change class of objects in order to use right plot method 
         class(output) <- c("sumscores","list")    
         class(output$samples_var_a) <- "samples"
-        class(output$samples_var_d) <- "samples"
+        class(output$samples_var_c) <- "samples"
         class(output$samples_var_e) <- "samples"
         class(output$samples_item_b) <- "samples"
         
@@ -399,44 +390,44 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         
     } else {
         #Save samples
-        samples_var_a = 1/out$tau_a[,,1]; samples_var_d = 1/out$tau_c[,,1]
+        samples_var_a = 1/out$tau_a[,,1]; samples_var_c = 1/out$tau_c[,,1]
         samples_beta0 = out$beta0[,,1]; samples_beta1 = out$beta1[,,1]; samples_item_b = out$item_b[,,1]
         if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
         
         #Calculate mean values: 
-        var_a = mean(samples_var_a); var_d = mean(samples_var_d)
+        var_a = mean(samples_var_a); var_c = mean(samples_var_c)
         beta0 = mean(samples_beta0); beta1 = mean(samples_beta1)
         item_b = apply(samples_item_b, 1, mean)
         if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate SDs: 
-        sd_var_a = sd(samples_var_a); sd_var_d = sd(samples_var_d)
+        sd_var_a = sd(samples_var_a); sd_var_c = sd(samples_var_c)
         sd_beta0 = sd(samples_beta0); sd_beta1 = sd(samples_beta1)
         sd_item_b = apply(samples_item_b, 1, sd)
         if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
         #Calculate HPD: 
-        hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_d = HPD(samples_var_d, 0.95)
+        hpd_var_a = HPD(samples_var_a, 0.95); hpd_var_c = HPD(samples_var_c, 0.95)
         hpd_beta0 = HPD(samples_beta0, 0.95); hpd_beta1 = HPD(samples_beta1, 0.95)
         hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
         if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
         
         #Put results in a table 
-        results = matrix(c(var_a, sd_var_a, var_d, sd_var_d, beta0, sd_beta0, beta1, sd_beta1), 2, 4)
-        colnames(results) <- c("varA","varD","beta0", "beta1")
+        results = matrix(c(var_a, sd_var_a, var_c, sd_var_c, beta0, sd_beta0, beta1, sd_beta1), 2, 4)
+        colnames(results) <- c("varA","varC","beta0", "beta1")
         rownames(results) <- c("Posterior mean","Posterior standard deviation")
         results = as.table(results) 
         
         #And save output in a list: 
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_d = samples_var_d, 
+        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                       samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_d = hpd_var_d, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
                       hpd_item_b = hpd_item_b)
         
         if(PL_2 == TRUE || GPCM == TRUE){
-            output = list(results = results, samples_var_a = samples_var_a, samples_var_d = samples_var_d, 
+            output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                           samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                          hpd_var_a = hpd_var_a, hpd_var_d = hpd_var_d, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                          hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
                           hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha)
         }
         
@@ -444,7 +435,7 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         #Change class of objects in order to use right plot method 
         class(output) <- c("ge_irt","list")    
         class(output$samples_var_a) <- "samples"
-        class(output$samples_var_d) <- "samples"
+        class(output$samples_var_c) <- "samples"
         class(output$samples_beta0) <- "samples"
         class(output$samples_beta1) <- "samples"     
         class(output$samples_item_b) <- "samples"

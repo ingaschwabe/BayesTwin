@@ -1,7 +1,8 @@
 #==========================================================
 # simulate_ACE.R
 # Simulation of twin data under the ACE model 
-# Subroutine for simulate_twin_data.R
+# Subroutine for master function simulate_twin_data()
+# BayesTwin package
 #==========================================================
 
 simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e,

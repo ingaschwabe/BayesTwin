@@ -1,7 +1,8 @@
 #==========================================================
 # simulate_AE.R
 # Simulation of twin data under the AE model 
-# Subroutine for simulate_twin_data.R
+# Subroutine for master function simulate_twin_data()
+# BayesTwin package
 #==========================================================
 simulate_AE = function(n_mz, n_dz, var_a, var_c, var_e,
                         n_items, n_var, ge, ge_beta0, ge_beta1){

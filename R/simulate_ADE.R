@@ -1,7 +1,8 @@
 #==========================================================
 # simulate_ADE.R
 # Simulation of twin data under the ADE model 
-# Subroutine for simulate_twin_data.R
+# Subroutine for master function simulate_twin_data()
+# BayesTwin package
 #==========================================================
 
 simulate_ADE = function(n_mz, n_dz, var_a, var_d,  var_e,

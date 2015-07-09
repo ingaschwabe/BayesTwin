@@ -1,11 +1,13 @@
 #==========================================================
+# sumscores_cov_ace.R
 # Analysis of twin data using sum scores under the ACE model.
 # Inclusion of covariates is possible.  
 # function sumscores_cov.R for BayesTwin package
 # 
 # This function writes a JAGS script for an ACE model 
 # with covaristes. A prior probability distribution is 
-# used for missing data in the covariates. 
+# used for missing data in the covariates.
+# BayesTwin package
 #==========================================================
 
 sumscores_cov <- function(data_mz, data_dz, 

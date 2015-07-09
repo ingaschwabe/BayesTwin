@@ -1,7 +1,9 @@
 #==========================================================
-# Simulation of twin data under the AE, ADE or ACE model, 
+# simulate_twin_data.R
+# Simulation of twin data under the AE, ADE or ACE model,
 # using sum  scores or item scores, optional with GxE 
 # and/or environmental covariates
+# BayesTwin package
 #==========================================================
 
 #setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
