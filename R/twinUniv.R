@@ -1,7 +1,8 @@
 #==========================================================
+# twinUniv.R
 # Master function that calls subroutines for univariate
 # analyses with one phenotype. 
-# BayesTwin package - Bayesian Analysis of Twin Data 
+# BayesTwin package
 #==========================================================
 #setwd("C:/Users/schwabei/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 #setwd("/Users/stephanievandenberg/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
@@ -10,12 +11,13 @@
 
 twinUniv = function(data_mz, data_dz, 
                     twin1_datacols_p, twin2_datacols_p,
-                    twin1_datacols_cov = NA, twin2_datacols_cov = NA,
+                    twin1_datacols_cov = NA, twin2_datacols_cov = NA, #####KOMT LATER
                     decomp_model = "ACE",
                     irt_model = "1PL",
-                    #cov_imputation = TRUE, 
+                    cov_imputation = FALSE,  ##### KOMT LATER
                     ge = FALSE,
-                    n_iter = 10000, n_burnin = 5000){
+                    n_iter = 10000, n_burnin = 5000,
+                    var_prior = "INV_GAMMA"){
     #Load HPD function: 
     source("HPD.R")                                                         
     
@@ -28,13 +30,12 @@ twinUniv = function(data_mz, data_dz,
     data_dz = data_dz[,c(twin1_datacols_p, twin2_datacols_p)]
     
     #Test if its item data: 
-    itemdata = NA
-    if(length(twin1_datacols) == 1){
-        itemdata = FALSE
-    } else {itemdata = TRUE}
+    if(length(twin1_datacols_p) == 1){
+        print("Error! You need phenotypic data on item level to run the analysis!")
+    } 
     
-    #When data_imputation = FALSE, use only complete cases: 
-    if(is.na(twin1_datacols_cov) && data_imputation == FALSE){
+    #When cov_imputation = FALSE, use only complete cases: 
+    if(is.na(twin1_datacols_cov) && cov_imputation == FALSE){
         data_mz = na.omit(data_mz)
         data_dz = na.omit(data_dz)
     }
@@ -43,7 +44,7 @@ twinUniv = function(data_mz, data_dz,
     covariates = NA
     
     #Option I: Use covaritaes without missing value imputation: 
-    if (is.na(twin1_datacols_cov) == FALSE && data_imputation == TRUE){
+    if (is.na(twin1_datacols_cov) == FALSE && cov_imputation == TRUE){
         X_mz_twin1 = data_mz[,twin1_datacols_cov]
         X_mz_twin2 = data_mz[,twin2_datacols_cov]
         X_dz_twin1 = data_dz[,twin1_datacols_cov]
@@ -88,7 +89,7 @@ twinUniv = function(data_mz, data_dz,
         }
                         
     #Option II: Use covariates with missing value imputation:
-    } else if (is.na(twin1_datacols_cov) == FALSE && data_imputation == FALSE){
+    } else if (is.na(twin1_datacols_cov) == FALSE && cov_imputation == FALSE){
         
         #Use only data with complete cases, meaning that cases with missing values
         #on covariate data will be ommited from the data anlysis, even if that means
@@ -114,53 +115,54 @@ twinUniv = function(data_mz, data_dz,
     
     #==========================================================
     #==========================================================
-    # Subroutines for ACE model
+    # Subroutines for AE model
     #==========================================================
-
-    #==========================================================
-    # Call subroutines for analyses based on sumscores
-    #==========================================================
-    #### I. With covariates: #####
-    #whether GE is estimated will be determined by ge = FALSE/TRUE
-    if(itemdata == FALSE && covariates == TRUE && model == "ACE"){
-        source("sumscores_cov.R")
-        output = sumscores_cov(data_mz = data_mz, data_dz = data_dz,
-                               X_mz_twin1 = X_mz_twin1, X_mz_twin2 = X_mz_twin2,
-                               X_dz_twin1 = X_dz_twin1, X_dz_twin2 = X_dz_twin2,
-                               dich_cov = dich_cov, cont_cov = cont_cov, 
-                               n_burnin = n_burnin, n_iter = n_iter,
-                               ge = ge, dich = dich) 
-    }
-    
-    #### II. Without covariates: #####
-    #whether GE is estimated will be determined by ge = FALSE/TRUE
-    if(itemdata == FALSE && covariates == FALSE && model == "ACE"){
-        source("sumscores.R")
-        output = sumscores(data_mz = data_mz, data_dz = data_dz,
-                           ge = ge, 
-                           n_burnin = n_burnin, n_iter = n_iter)            
-    } 
-    
-    #==========================================================
-    # Call subroutines for item data analyses
-    #==========================================================
-    #I. With covariates: 
     #Option for IRT model (1pl/2pl or (G)PCM) passed to function
     #with irt_model object and option fo genotype by environment
     #interaction by ge = FALSE/TRUE
-    if(itemdata == TRUE && covariates == TRUE && model == "ACE"){
-        source("irt_cov.R")
-        output = irt(data_mz = data_mz, data_dz = data_dz, 
-                     n_burnin = n_burnin, n_iter = n_iter, 
-                     ge = ge, irt_model = irt_model)
+    
+    #I. With covariates: 
+    if(covariates == TRUE && decomp_model == "AE"){
+        source("irt_ae_cov.R")
+        output = irt_ae_cov(data_mz = data_mz, data_dz = data_dz, 
+                            n_burnin = n_burnin, n_iter = n_iter, 
+                            ge = ge, irt_model = irt_model, 
+                            N_cov = N_cov, var_prior = var_prior)
     }
-
+    
     #II. Without covariates: 
-    if(itemdata == TRUE && covariates == FALSE && model == "ACE"){
-        source("irt.R")
-        output = irt(data_mz = data_mz, data_dz = data_dz, 
-                     n_burnin = n_burnin, n_iter = n_iter,
-                     ge = ge, irt_model = irt_model)              
+    if(covariates == FALSE && decomp_model == "AE"){
+        source("irt_ae.R")
+        output = irt_ae(data_mz = data_mz, data_dz = data_dz, 
+                        n_burnin = n_burnin, n_iter = n_iter,
+                        ge = ge, irt_model = irt_model,
+                        var_prior = var_prior)              
+    } 
+    
+    #==========================================================
+    # Subroutines for ACE model
+    #==========================================================
+    #Option for IRT model (1pl/2pl or (G)PCM) passed to function
+    #with irt_model object and option fo genotype by environment
+    #interaction by ge = FALSE/TRUE
+    
+    #I. With covariates: 
+    if(covariates == TRUE && decomp_model == "ACE"){
+        source("irt_ace_cov.R")
+        output = irt_ace_cov(data_mz = data_mz, data_dz = data_dz, 
+                            n_burnin = n_burnin, n_iter = n_iter, 
+                            ge = ge, irt_model = irt_model, 
+                            N_cov = N_cov,
+                            var_prior = var_prior)
+    }
+    
+    #II. Without covariates: 
+    if(covariates == FALSE && decomp_model == "ACE"){
+        source("irt_ace.R")
+        output = irt_ace(data_mz = data_mz, data_dz = data_dz, 
+                        n_burnin = n_burnin, n_iter = n_iter,
+                        ge = ge, irt_model = irt_model,
+                        var_prior = var_prior)              
     } 
     
 
@@ -168,53 +170,32 @@ twinUniv = function(data_mz, data_dz,
     #==========================================================
     # Subroutines for ADE model
     #==========================================================
-    
-    #==========================================================
-    # Call subroutines for analyses based on sumscores
-    #==========================================================
-    #### I. With covariates: #####
-    #whether GE is estimated will be determined by ge = FALSE/TRUE
-    #if(itemdata == FALSE && covariates == TRUE && model == "ACE"){
-    #source("sumscores_ade_cov.R")
-    #output = sumscores_ade_cov(data_mz = data_mz, data_dz = data_dz,
-    #                           X_mz_twin1 = X_mz_twin1, X_mz_twin2 = X_mz_twin2,
-    #                           X_dz_twin1 = X_dz_twin1, X_dz_twin2 = X_dz_twin2,
-    #                           dich_cov = dich_cov, cont_cov = cont_cov, 
-    #                           n_burnin = n_burnin, n_iter = n_iter
-    #                           ge = ge, dich = dich) 
-    # }
-
-    #### II. Without covariates: #####
-    #whether GE is estimated will be determined by ge = FALSE/TRUE
-    if(itemdata == FALSE && covariates == FALSE && model == "ADE"){
-        source("sumscores_ade.R")
-        output = sumscores_ade(data_mz = data_mz, data_dz = data_dz,
-                               ge = ge, 
-                               n_burnin = n_burnin, n_iter = n_iter)            
-    } 
-
-    
-    #==========================================================
-    # Call subroutines for item data analyses
-    #==========================================================
-    #I. With covariates: 
     #Option for IRT model (1pl/2pl or (G)PCM) passed to function
     #with irt_model object and option fo genotype by environment
     #interaction by ge = FALSE/TRUE
-
+    
+    #I. With covariates: 
+    if(covariates == TRUE && decomp_model == "ADE"){
+        source("irt_ade_cov.R")
+        output = irt_ade_cov(data_mz = data_mz, data_dz = data_dz, 
+                             n_burnin = n_burnin, n_iter = n_iter, 
+                             ge = ge, irt_model = irt_model, 
+                             N_cov = N_cov, var_prior = var_prior)
+    }
+    
     #II. Without covariates: 
-    if(itemdata == TRUE && covariates == FALSE && model == "ADE"){
-        source("irt_ADE.R")
-        output = irt(data_mz = data_mz, data_dz = data_dz, 
-                    n_burnin = n_burnin, n_iter = n_iter,
-                    ge = ge, irt_model = irt_model)              
+    if(covariates == FALSE && decomp_model == "ADE"){
+        source("irt_ade.R")
+        output = irt_ade(data_mz = data_mz, data_dz = data_dz, 
+                         n_burnin = n_burnin, n_iter = n_iter,
+                         ge = ge, irt_model = irt_model)              
     } 
 
     
     #==========================================================
     # Output
     #==========================================================
-    #source("plot.samples.R") #load method for generic function (hoeft later niet meer)
+    source("plot.samples.R") #load method for generic function (hoeft later niet meer)
     
     #Remind user of convergence-issue
     cat("\n Here give some advice over convergence")
@@ -228,12 +209,27 @@ twinUniv = function(data_mz, data_dz,
 
 library(rjags)
 
-
 #Run function: 
 #Simulate data: 
-#source("simulate_twin_data.R")
-#data <- simulate_twin_data(nmz = 10, ndz = 20, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-#                           model = "ACE", n_items = 8, n_var = 3)
+source("simulate_twin_data.R")
+data <- simulate_twin_data(n_mz = 10, n_dz = 20, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
+                           model = "AE", n_items = 8)
+
+data$y_mz
+outtwin = twinUniv(data_mz = data$y_mz, data_dz = data$y_dz, 
+                   twin1_datacols_p = c(1:8), twin2_datacols_p = c(9:16),
+                   decomp_model = "AE",
+                   irt_model = "1PL",
+                   cov_imputation = TRUE,  ##### KOMT LATER
+                   ge = FALSE,
+                   n_iter = 10000, n_burnin = 5000,
+                   var_prior = "INV_GAMMA")
+
+names(outtwin)
+head(outtwin$samples_var_a)
+head(outtwin$samples_var_e)
+outtwin$results
+
 #IRT + GE
 #twin_analysis2 = twin_analysis(data_mz = data_mz, data_dz = data_dz, 
 #                               twin1_datacols = 1:8, twin2_datacols = 9:16, 

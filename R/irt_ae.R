@@ -13,7 +13,8 @@
 # BayesTwin package
 #==========================================================
 
-irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
+irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
+                   var_prior){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -30,6 +31,12 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         PCM = TRUE
     }
         
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior == "INV_GAMMA"){
+        INV_GAMMA = TRUE
+    }
+    
     #Determine number of twin pairs
     n_mz <- nrow(data_mz) ; n_dz<- nrow(data_dz)
     
@@ -248,7 +255,13 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     doubletau_a <- 2*tau_a
 
     #Priors
-    tau_a ~ dgamma(1,1)   
+    ",ifelse(INV_GAMMA,"
+    tau_a ~ dgamma(1,1) 
+    tau_e ~ dgamma(1,1) #not used when ge = TRUE
+    ","
+    tau_a ~ dunif(0,100)
+    tau_e ~ dunif(0,100) #not used when ge = TRUE
+    "),"  
     
     ",ifelse(PL_1,"
     for (j in 1:n_items){
@@ -299,12 +312,12 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    "tau_e ~ dgamma(1,1)"),"
+    ""),"
     }")
 
     jags_file_irt_ae <- tempfile(fileext=".txt")
     write(jags_model_irt_ae,jags_file_irt_ae)
-    #writeLines(jags_model_irt, con = "file.txt", sep = "\n", useBytes = FALSE)
+    #writeLines(jags_model_irt_ae, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
@@ -318,7 +331,7 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk") 
     }
 
-    jags <- jags.model(jags_file_irt, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt_ae, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
     
     if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){

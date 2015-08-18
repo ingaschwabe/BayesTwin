@@ -7,23 +7,24 @@
 #==========================================================
 
 #setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
-simulate_twin_data <- function(n_mz, n_dz, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
-                               model = "ACE", n_items = 20, n_var = 0, ge = FALSE, ge_beta0 = 
+simulate_twin_data <- function(n_mz = 500, n_dz = 1000, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
+                               model = "ACE", n_items = 30, ge = FALSE, ge_beta0 = 
                                log(0.5), ge_beta1 = 1.5){
     
     #==========================================================
     # Error messages
-    #==========================================================    
+    #==========================================================  
     if(n_items < 0){
         cat("Error: \n
-             The number of test items is negative. Something went wrong here!")
+             The number of test items is negative. Something went wrong here!
+             Use a number > 0 for the parameter 'n_items'.")
     }
     
     
     if(n_items == 0){
         cat("Error: \n
              The number of test items used for the simulation is equal to 0. Without any items, the
-             twin data cannot be simulated!")
+             twin data cannot be simulated! Use a number > 0 for the parameter 'n_items'.")
     }
     
     if (ge == TRUE && ge_beta0 == 0){
@@ -59,19 +60,19 @@ simulate_twin_data <- function(n_mz, n_dz, var_a = 0.5, var_c = 0.3,  var_e = 0.
         print("Simulating data under an ACE model...")
         source("simulate_ACE.R")
         output = simulate_ACE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_c = var_c, 
-                              var_e = var_e, n_items = n_items, n_var = n_var, ge = ge,
+                              var_e = var_e, n_items = n_items, ge = ge,
                               ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
     } else if (model == "ADE"){
         print("Simulating data under an ADE model...")
         source("simulate_ADE.R")
         output = simulate_ADE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_d = var_d, 
-                              var_e = var_e, n_items = n_items, n_var = n_var, ge = ge,
+                              var_e = var_e, n_items = n_items, ge = ge,
                               ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
     } else {
         print("Simulating data under an AE model...")
         source("simulate_AE.R")
         output = simulate_AE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_e = var_e, 
-                             n_items = n_items, n_var = n_var, ge = ge,
+                             n_items = n_items, ge = ge,
                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
     }
     #==========================================================

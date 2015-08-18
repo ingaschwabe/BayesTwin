@@ -14,10 +14,10 @@
 # BayesTwin package
 #==========================================================
 
-irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov){
+irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov,
+                        var_prior){
     
-    #Make boolean variable to create model string with the 
-    #right IRT model 
+    #Make boolean variable to create model string with the right IRT model 
     PL_1 = FALSE; PL_2 = FALSE; GPCM = FALSE; PCM = FALSE
     
     if(irt_model == "1PL"){
@@ -28,6 +28,12 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         GPCM = TRUE
     } else {
         PCM = TRUE
+    }
+    
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior =="INV_GAMMA"){
+        INV_GAMMA = TRUE
     }
     
     #Determine number of twin pairs
@@ -227,14 +233,23 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         ","
         "),"        
         }
-        #Priors
+
         mu <- 0 #to identify scale 
-        doubletau_a <- 2*tau_a
-        b[1:N_cov] ~ dmnorm(mu_b[1:N_cov], tau_b[,]) #in R: mu_b = rep(0,N_cov), tau_b = diag(1, N_cov)
-                                
+        doubletau_a <- 2*tau_a        
+        
         #Priors
+        b[1:N_cov] ~ dmnorm(mu_b[1:N_cov], tau_b[,]) #in R: mu_b = rep(0,N_cov), tau_b = diag(1, N_cov)
+
+        ",ifelse(INV_GAMMA,"
         tau_c ~ dgamma(1,1)
-        tau_a ~ dgamma(1,1)   
+        tau_a ~ dgamma(1,1) 
+        tau_e ~ dgamma(1,1) #not used when ge = TRUE
+        ","
+        tau_c ~ dunif(0,100)
+        tau_a ~ dunif(0,100)
+        tau_e ~ dunif(0,100) #not used when ge = TRUE
+        "),"
+
         ",ifelse(PL_1,"
         for (j in 1:n_items){
             item_b[j] ~ dnorm(0,.1)
@@ -273,7 +288,7 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         ",ifelse(ge,"
         beta0 ~ dnorm(-1,.5)
         beta1 ~ dnorm(0,.1)",
-        "tau_e ~ dgamma(1,1)"),"
+        ""),"
 }")
 
     jags_file_irt_ace_cov <- tempfile(fileext=".txt")
@@ -283,7 +298,7 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================   
-    inits = list(tau_a = 2, tau_c = 5)
+    inits = NULL
     jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, rep(0,N_cov), diag(1, N_cov), N_cov,
                       X_mz_twin1, X_mz_twin2, X_dz_twin1, X_dz_twin2)
     names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "mu_b", "tau_b", "N_cov",

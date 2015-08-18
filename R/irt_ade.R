@@ -13,7 +13,8 @@
 # BayesTwin package
 #==========================================================
 
-irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
+irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
+                    var_prior){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -28,6 +29,12 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         GPCM = TRUE
     } else {
         PCM = TRUE
+    }
+    
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior == "INV_GAMMA"){
+        INV_GAMMA = TRUE
     }
         
     #Determine number of twin pairs
@@ -259,9 +266,15 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     four_third_tau_d <- 4/3 * tau_d
 
     #Priors
+    ",ifelse(INV_GAMMA,"
     tau_d ~ dgamma(1,1)
-    tau_a ~ dgamma(1,1)   
-    
+    tau_a ~ dgamma(1,1) 
+    tau_e ~ dgamma(1,1) #not used when ge = TRUE
+    ","
+    tau_d ~ dunif(0,100)
+    tau_a ~ dunif(0,100)
+    tau_e ~ dunif(0,100) #not used when ge = TRUE
+    ")," 
     ",ifelse(PL_1,"
     for (j in 1:n_items){
       item_b[j] ~ dnorm(0,.1)
@@ -311,17 +324,17 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    "tau_e ~ dgamma(1,1)"),"
+    ""),"
     }")
 
     jags_file_irt_ade <- tempfile(fileext=".txt")
     write(jags_model_irt_ade,jags_file_irt_ade)
-    #writeLines(jags_model_irt, con = "file.txt", sep = "\n", useBytes = FALSE)
+    #writeLines(jags_model_irt_ade, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================
-    inits = list(tau_a = 2, tau_d = 5)
+    inits = NULL
     jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
     names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     

@@ -14,7 +14,8 @@
 # BayesTwin package
 #==========================================================
 
-irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov){
+irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov,
+                       var_prior){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -28,6 +29,12 @@ irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov)
         GPCM = TRUE
     } else {
         PCM = TRUE
+    }
+    
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior == "INV_GAMMA"){
+        INV_GAMMA = TRUE
     }
     
     #Determine number of twin pairs
@@ -229,7 +236,14 @@ irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov)
         b[1:N_cov] ~ dmnorm(mu_b[1:N_cov], tau_b[,]) #in R: mu_b = rep(0,N_cov), tau_b = diag(1, N_cov)
                                 
         #Priors
-        tau_a ~ dgamma(1,1)   
+        ",ifelse(INV_GAMMA,"
+        tau_a ~ dgamma(1,1) 
+        tau_e ~ dgamma(1,1) #not used when ge = TRUE
+        ","
+        tau_aa ~ dunif(0,100)
+        tau_e ~ dunif(0,100) #not used when ge = TRUE
+        "),"
+        
         ",ifelse(PL_1,"
         for (j in 1:n_items){
             item_b[j] ~ dnorm(0,.1)
@@ -268,11 +282,11 @@ irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov)
         ",ifelse(ge,"
         beta0 ~ dnorm(-1,.5)
         beta1 ~ dnorm(0,.1)",
-        "tau_e ~ dgamma(1,1)"),"
+        ""),"
 }")
 
     jags_file_irt_ae_cov <- tempfile(fileext=".txt")
-    write(jags_model_irt_ae_cov,jags_file_irt_ace_cov)
+    write(jags_model_irt_ae_cov,jags_file_irt_ae_cov)
     #writeLines(jags_model_irt_ae_cov, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
@@ -291,7 +305,7 @@ irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov)
                              "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2") 
     }
     
-    jags <- jags.model(jags_file_irt_ace_cov, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt_ae_cov, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
 
     if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){

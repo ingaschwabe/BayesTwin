@@ -13,7 +13,8 @@
 # BayesTwin package
 #==========================================================
 
-irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
+irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
+                    var_prior){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -28,6 +29,12 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         GPCM = TRUE
     } else {
         PCM = TRUE
+    }
+    
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior == "INV_GAMMA"){
+        INV_GAMMA = TRUE
     }
         
     #Determine number of twin pairs
@@ -244,15 +251,20 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         "),"        
     }
     
-    
-    #Priors
     mu <- 0 #to identify scale 
     doubletau_a <- 2*tau_a
 
     #Priors
+    ",ifelse(INV_GAMMA,"
     tau_c ~ dgamma(1,1)
-    tau_a ~ dgamma(1,1)   
-    
+    tau_a ~ dgamma(1,1) 
+    tau_e ~ dgamma(1,1) #not used when ge = TRUE
+    ","
+    tau_c ~ dunif(0,100)
+    tau_a ~ dunif(0,100)
+    tau_e ~ dunif(0,100) #not used when ge = TRUE
+    "),"
+
     ",ifelse(PL_1,"
     for (j in 1:n_items){
       item_b[j] ~ dnorm(0,.1)
@@ -302,17 +314,17 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    "tau_e ~ dgamma(1,1)"),"
+    ""),"
     }")
 
     jags_file_irt_ace <- tempfile(fileext=".txt")
     write(jags_model_irt_ace,jags_file_irt_ace)
-    #writeLines(jags_model_irt, con = "file.txt", sep = "\n", useBytes = FALSE)
+    #writeLines(jags_model_irt_ace, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================
-    inits = list(tau_a = 2, tau_c = 5)
+    inits = NULL
     jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
     names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     
@@ -321,7 +333,7 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model){
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk") 
     }
 
-    jags <- jags.model(jags_file_irt, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt_ace, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
     
     if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){

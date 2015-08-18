@@ -14,7 +14,8 @@
 # BayesTwin package
 #==========================================================
 
-irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov){
+irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov,
+                        var_prior){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
@@ -28,6 +29,12 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         GPCM = TRUE
     } else {
         PCM = TRUE
+    }
+    
+    #Make boolean variable to create model string with the right prior
+    INV_GAMMA = FALSE
+    if(var_prior == "INV_GAMMA"){
+        INV_GAMMA = TRUE
     }
     
     #Determine number of twin pairs
@@ -227,7 +234,7 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         ","
         "),"        
         }
-        #Priors
+
         mu <- 0 #to identify scale 
 
         #Genetic relations: 
@@ -235,12 +242,19 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         quarter_tau_d <- 4 * tau_d
         four_third_tau_d <- 4/3 * tau_d
         
+        #Priors
+        ",ifelse(INV_GAMMA,"
+        tau_d ~ dgamma(1,1)
+        tau_a ~ dgamma(1,1) 
+        tau_e ~ dgamma(1,1) #not used when ge = TRUE
+        ","
+        tau_d ~ dunif(0,100)
+        tau_a ~ dunif(0,100)
+        tau_e ~ dunif(0,100) #not used when ge = TRUE
+        "),"
+
         b[1:N_cov] ~ dmnorm(mu_b[1:N_cov], tau_b[,]) #in R: mu_b = rep(0,N_cov), tau_b = diag(1, N_cov)
                                 
-        #Priors
-        tau_a ~ dgamma(1,1)   
-        tau_d ~ dgamma(1,1)
-
         ",ifelse(PL_1,"
         for (j in 1:n_items){
             item_b[j] ~ dnorm(0,.1)
@@ -279,12 +293,12 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         ",ifelse(ge,"
         beta0 ~ dnorm(-1,.5)
         beta1 ~ dnorm(0,.1)",
-        "tau_e ~ dgamma(1,1)"),"
+        ""),"
 }")
 
-    jags_file_irt_ace_cov <- tempfile(fileext=".txt")
-    write(jags_model_irt_ace_cov,jags_file_irt_ace_cov)
-    #writeLines(jags_model_irt_ace_cov, con = "file.txt", sep = "\n", useBytes = FALSE)
+    jags_file_irt_ade_cov <- tempfile(fileext=".txt")
+    write(jags_model_irt_ade_cov,jags_file_irt_ade_cov)
+    #writeLines(jags_model_irt_ade_cov, con = "file.txt", sep = "\n", useBytes = FALSE)
     
     #==========================================================
     # II. Run JAGS analysis
@@ -302,7 +316,7 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
                              "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2") 
     }
     
-    jags <- jags.model(jags_file_irt_ace_cov, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt_ade_cov, jags_data, inits, n.chains = 1, quiet=FALSE)
     update(jags, n_burnin)
 
     if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
