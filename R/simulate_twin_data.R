@@ -9,7 +9,7 @@
 #setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 simulate_twin_data <- function(n_mz = 500, n_dz = 1000, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
                                model = "ACE", n_items = 30, ge = FALSE, ge_beta0 = 
-                               log(0.5), ge_beta1 = 1.5){
+                               log(0.5), ge_beta1 = 1.5, irt_model = "1PL"){
     
     #==========================================================
     # Error messages
@@ -61,19 +61,22 @@ simulate_twin_data <- function(n_mz = 500, n_dz = 1000, var_a = 0.5, var_c = 0.3
         source("simulate_ACE.R")
         output = simulate_ACE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_c = var_c, 
                               var_e = var_e, n_items = n_items, ge = ge,
-                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1,
+                              irt_model = irt_model)
     } else if (model == "ADE"){
         print("Simulating data under an ADE model...")
         source("simulate_ADE.R")
         output = simulate_ADE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_d = var_d, 
                               var_e = var_e, n_items = n_items, ge = ge,
-                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+                              ge_beta0 = ge_beta0, ge_beta1 = ge_beta1,
+                              irt_model = irt_model)
     } else {
         print("Simulating data under an AE model...")
         source("simulate_AE.R")
         output = simulate_AE(n_mz = n_mz, n_dz = n_dz, var_a = var_a, var_e = var_e, 
                              n_items = n_items, ge = ge,
-                             ge_beta0 = ge_beta0, ge_beta1 = ge_beta1)
+                             ge_beta0 = ge_beta0, ge_beta1 = ge_beta1,
+                             irt_model = irt_model)
     }
     #==========================================================
     return(output)    
