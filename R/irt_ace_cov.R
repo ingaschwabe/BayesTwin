@@ -54,9 +54,9 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
                                 
         ",ifelse(ge,"
             a_mz[fam] <- f_mz[fam] - c_mz[fam]
-            tau_e[fam] <- 1/(exp(beta0 + (beta1*a_mz[fam])))
-    	    pheno_mz[fam,1] ~ dnorm(f_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e[fam]) 
-		    pheno_mz[fam,2] ~ dnorm(f_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e[fam])
+            tau_e_mz[fam] <- 1/(exp(beta0 + (beta1*a_mz[fam])))
+    	    pheno_mz[fam,1] ~ dnorm(f_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e_mz[fam]) 
+		    pheno_mz[fam,2] ~ dnorm(f_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e_mz[fam])
          ","
             pheno_mz[fam,1] ~ dnorm(f_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e) 
 		    pheno_mz[fam,2] ~ dnorm(f_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e)

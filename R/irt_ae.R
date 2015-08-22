@@ -53,10 +53,10 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
             a_mz[fam] ~ dnorm(mu, tau_a) 
           
         ",ifelse(ge,"
-            tau_e[fam] <- 1/(exp(beta0 + (beta1*a_mz[fam])))
+            tau_e_mz[fam] <- 1/(exp(beta0 + (beta1*a_mz[fam])))
             
             for (twin in 1:2){
-                pheno_mz[fam,twin] ~ dnorm(a_mz[fam],tau_e[fam])   
+                pheno_mz[fam,twin] ~ dnorm(a_mz[fam],tau_e_mz[fam])   
             }
         ","
             for (twin in 1:2){

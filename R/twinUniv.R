@@ -34,12 +34,7 @@ twinUniv = function(data_mz, data_dz,
         print("Error! You need phenotypic data on item level to run the analysis!")
     } 
     
-    #When cov_imputation = FALSE, use only complete cases: 
-    if(is.na(twin1_datacols_cov) && cov_imputation == FALSE){
-        data_mz = na.omit(data_mz)
-        data_dz = na.omit(data_dz)
-    }
-    
+    ########## Covariates #############################################
     #Test if covariates are used:
     covariates = NA
     
@@ -58,7 +53,6 @@ twinUniv = function(data_mz, data_dz,
         
         dich = NA; cont = NA
         
-                
         #Apply on all covariate data: (assuming that the same covariates cannot 
         #be dichotomous for twin 1 and continous for twin 2 + assuming that 
         #the same covaraites are dichotomous for MZ and DZ twins
@@ -206,34 +200,3 @@ twinUniv = function(data_mz, data_dz,
     print(output$results) #table that is made in subroutine (always give same name!)
     return(output) 
 }
-
-library(rjags)
-
-#Run function: 
-#Simulate data: 
-source("simulate_twin_data.R")
-data <- simulate_twin_data(n_mz = 10, n_dz = 20, var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-                           model = "AE", n_items = 8)
-
-data$y_mz
-outtwin = twinUniv(data_mz = data$y_mz, data_dz = data$y_dz, 
-                   twin1_datacols_p = c(1:8), twin2_datacols_p = c(9:16),
-                   decomp_model = "AE",
-                   irt_model = "1PL",
-                   cov_imputation = TRUE,  ##### KOMT LATER
-                   ge = FALSE,
-                   n_iter = 10000, n_burnin = 5000,
-                   var_prior = "INV_GAMMA")
-
-names(outtwin)
-head(outtwin$samples_var_a)
-head(outtwin$samples_var_e)
-outtwin$results
-
-#IRT + GE
-#twin_analysis2 = twin_analysis(data_mz = data_mz, data_dz = data_dz, 
-#                               twin1_datacols = 1:8, twin2_datacols = 9:16, 
-#                               ordinal = T, model = "ACE", common = T,
-#                               n_iter = 100, n_burnin = 100, ge = TRUE)
-#twin_analysis2
-#plot(twin_analysis2$samples_var_a, type = "Sampling plot")

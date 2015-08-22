@@ -54,8 +54,8 @@ irt_ade_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
             g_mz[fam] ~ dnorm(a_mz[fam], tau_d)                       
         ",ifelse(ge,"
             tau_e_mz[fam] <- 1/(exp(beta0+beta1*g_mz[fam])) #GxE on the whole genotype
-            pheno_mz[fam,1] ~ dnorm(g_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e[fam]) 
-		    pheno_mz[fam,2] ~ dnorm(g_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e[fam])
+            pheno_mz[fam,1] ~ dnorm(g_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e_mz[fam]) 
+		    pheno_mz[fam,2] ~ dnorm(g_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e_mz[fam])
          ","
             pheno_mz[fam,1] ~ dnorm(g_mz[fam] + inprod(X_mz_twin1[fam,], b[1:N_cov]), tau_e) 
 		    pheno_mz[fam,2] ~ dnorm(g_mz[fam] + inprod(X_mz_twin2[fam,], b[1:N_cov]), tau_e)
