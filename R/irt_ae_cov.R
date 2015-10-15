@@ -293,16 +293,17 @@ irt_ae_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov,
     # II. Run JAGS analysis
     #==========================================================   
     inits = list(tau_a = 2)
-    jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, rep(0,N_cov), diag(1, N_cov), N_cov,
-                      X_mz_twin1, X_mz_twin2, X_dz_twin1, X_dz_twin2)
-    names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "mu_b", "tau_b", "N_cov",
-                         "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2")
     
     if (PCM == TRUE || GPCM == TRUE){
         jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, Nk, rep(0, N_cov), diag(1,N_cov), N_cov,
                           X_mz_twin1, X_mz_twin2, X_dz_twin1, X_dz_twin2)
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk", "mu_b", "tau_b", "N_cov",
                              "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2") 
+    } else {
+        jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, rep(0,N_cov), diag(1, N_cov), N_cov,
+                          X_mz_twin1, X_mz_twin2, X_dz_twin1, X_dz_twin2)
+        names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "mu_b", "tau_b", "N_cov",
+                             "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2")
     }
     
     jags <- jags.model(jags_file_irt_ae_cov, jags_data, inits, n.chains = 1, quiet=FALSE)

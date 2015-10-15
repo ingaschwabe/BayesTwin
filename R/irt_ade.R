@@ -335,12 +335,13 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     # II. Run JAGS analysis
     #==========================================================
     inits = NULL
-    jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
-    names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     
     if (PCM == TRUE || GPCM == TRUE){
         jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, Nk)
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items", "Nk") 
+    } else {
+        jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items)
+        names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     }
 
     jags <- jags.model(jags_file_irt_ade, jags_data, inits, n.chains = 1, quiet=FALSE)
