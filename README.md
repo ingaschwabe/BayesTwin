@@ -9,10 +9,13 @@ You can use subroutines (e.g. ACE decomposition with GxE and IRT model: ge_irt.R
 
 ###Installation
 Install JAGS (http://mcmc-jags.sourceforge.net) and Rtools (https://cran.r-project.org/bin/windows/Rtools/index.html). 
+
 Then run in R:
 
 install.packages("devtools")
+
 library(devtools)
+
 install_github("ingaschwabe/BayesTwin")
 
 Note: An error might occur when (an earlier version) of the package is already installed on your system (especially when you're using a Mac). In this case, deleting the package folder often solves the problem. The library path can be retrieved by calling the function .libPaths() 
