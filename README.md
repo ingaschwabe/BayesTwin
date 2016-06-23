@@ -1,6 +1,5 @@
 ## BayesTwin
-BayesTwin is an R package that can be used to perform bayesian analysis of twin data. The most common univariate and multivariate biometric models are included, as well as a method to study concordance rates. In addition, it includes functions that help
-plot relevant information in figures and compute posterior statistics such as 95% HPD intervals. Some models are directly implemented in R, but for most subroutines you will need the MCMC software package JAGS, which is freely obtainable at http://mcmc-jags.sourceforge.net.
+BayesTwin is an R package that can be used to perform Bayesian analysis of twin data at item level. The biometric midel is estimated simultaneously with an Item Response Theory (IRT) model, which prevents the finding of spurious interaction effects due to scale issues such as heterogeneous measurement error. The most common univariate biometric models are included, as well as a method to study concordance rates. In addition, it includes functions that help plot relevant information in figures and compute posterior statistics such as 95% HPD intervals. Some models are directly implemented in R, but for most subroutines you will need the MCMC software package JAGS, which is freely obtainable at http://mcmc-jags.sourceforge.net.
 
 Caution! This is work under progress! 
 
