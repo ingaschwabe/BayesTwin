@@ -5,9 +5,7 @@
 # BayesTwin package
 #==========================================================
 
-simulate_ADE = function(n_mz, n_dz, var_a, var_d,  var_e,
-                        n_items, ge, ge_beta0, ge_beta1,
-                        irt_model){
+simulate_ADE = function(n_mz, n_dz, var_a, var_d,  var_e, n_items, ge, ge_beta0, ge_beta1, irt_model){
 
     ## MZ twins: 
     # Simulate gentic additive and dominance effects:

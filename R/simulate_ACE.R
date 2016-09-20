@@ -5,9 +5,7 @@
 # BayesTwin package
 #==========================================================
 
-simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e,
-                        n_items, ge, ge_beta0, ge_beta1,
-                        irt_model){
+simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items, ge, ge_beta0, ge_beta1, irt_model){
 
     ## MZ twins:
     #Simulate common environmental effects, familial effects and retrieve genetic values for

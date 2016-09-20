@@ -14,11 +14,10 @@
 #==========================================================
 
 irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
-                    var_prior){
+                    var_prior, n_chains, fit_stats){
     
     #Make boolean variable to create model string with the 
     #right IRT model 
-    
     PL_1 = FALSE; PL_2 = FALSE; GPCM = FALSE; PCM = FALSE
     
     if(irt_model == "1PL"){
@@ -28,7 +27,7 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     } else if (irt_model == "GPCM"){
         GPCM = TRUE
     } else {
-        PCM = TRUE
+        PCM = TRUE  
     }
     
     #Make boolean variable to create model string with the right prior
@@ -38,7 +37,7 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     }
         
     #Determine number of twin pairs
-    n_mz <- nrow(data_mz) ; n_dz<- nrow(data_dz)
+    n_mz <- nrow(data_mz); n_dz<- nrow(data_dz)
     
     # determine number of phenotypic items
     n_items <- ncol(data_mz)/2
@@ -334,17 +333,34 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         names(jags_data)<- c("data_mz", "data_dz", "n_mz", "n_dz", "n_items") 
     }
     
-    jags <- jags.model(jags_file_irt_ace, jags_data, inits, n.chains = 1, quiet=FALSE)
+    jags <- jags.model(jags_file_irt_ace, jags_data, inits, n.chains = n_chains, quiet=FALSE)
     update(jags, n_burnin)
     
-    if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
-    } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b"), n_iter)
-    } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
-        out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha"), n_iter)
+    #Output, dependent on fit_stats, GE and IRT model
+    if (fit_stats == FALSE){
+        if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
+        } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b"), n_iter)
+        } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha"), n_iter)
+        } else {
+            out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha"), n_iter)
+        }
     } else {
-        out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha"), n_iter)
+        if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
+        } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
+        } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
+            out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
+        } else {
+            out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
+        }        
     }
     
     #==========================================================
@@ -379,26 +395,42 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         results = as.table(results) 
         
         #And save output in a list: 
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
-                      samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
-                      hpd_item_b = hpd_item_b)
-        
-        if(PL_2 == TRUE || GPCM == TRUE){
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
-                      samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
-                      hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha)
-        }
+        if (fit_stats == FALSE){
+            if(PL_2 == TRUE || GPCM == TRUE){
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
+                              hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha)
+            } else {
+                
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
+                              hpd_item_b = hpd_item_b)
+            }
+        } else {
+            if(PL_2 == TRUE || GPCM == TRUE){
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
+                              hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha, dic = out_dic)
+            } else {
+                
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_var_e = hpd_var_e, 
+                              hpd_item_b = hpd_item_b, dic = out_dic)
+                    }
+                }
         
         #Change class of objects in order to use right plot method 
-        class(output) <- c("sumscores","list")    
-        class(output$samples_var_a) <- "samples"
-        class(output$samples_var_c) <- "samples"
-        class(output$samples_var_e) <- "samples"
-        class(output$samples_item_b) <- "samples"
+        class(output) <- c("bayestwin","list")    
+        class(output$samples_var_a) <- "bayestwin"
+        class(output$samples_var_c) <- "bayestwin"
+        class(output$samples_var_e) <- "bayestwin"
+        class(output$samples_item_b) <- "bayestwin"
         
-        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "samples"}
+        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
         
     } else {
         #Save samples
@@ -431,30 +463,46 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         results = as.table(results) 
         
         #And save output in a list: 
-        output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
-                      samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                      hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                      hpd_item_b = hpd_item_b)
-        
-        if(PL_2 == TRUE || GPCM == TRUE){
+        if(fit_stats == FALSE){
             output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
                           samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
                           hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                          hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha)
+                          hpd_item_b = hpd_item_b)
+            
+            if(PL_2 == TRUE || GPCM == TRUE){
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                              hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha)
+            }
+        } else {
+            output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
+                          hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                          hpd_item_b = hpd_item_b, dic = out_dic)
+            
+            if(PL_2 == TRUE || GPCM == TRUE){
+                output = list(results = results, samples_var_a = samples_var_a, samples_var_c = samples_var_c, 
+                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
+                              hpd_var_a = hpd_var_a, hpd_var_c = hpd_var_c, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
+                              hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha, dic = out_dic)
         }
         
         
         #Change class of objects in order to use right plot method 
         class(output) <- c("ge_irt","list")    
-        class(output$samples_var_a) <- "samples"
-        class(output$samples_var_c) <- "samples"
-        class(output$samples_beta0) <- "samples"
-        class(output$samples_beta1) <- "samples"     
-        class(output$samples_item_b) <- "samples"
+        class(output$samples_var_a) <- "bayestwin"
+        class(output$samples_var_c) <- "bayestwin"
+        class(output$samples_beta0) <- "bayestwin"
+        class(output$samples_beta1) <- "bayestwin"     
+        class(output$samples_item_b) <- "bayestwin"
         
-        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "samples"}
+        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
         
+                }
+    
     }
     
     return(output)
 }
+    
