@@ -4,7 +4,7 @@ Title: Bayesian analysis of twin data
 Version: 1.0
 Date: 2014-09-11
 Author: Inga Schwabe, Stephanie M. van den Berg
-Maintainer: Inga Schwabe <i.schwabe@utwente.nl>
+Maintainer: Inga Schwabe <ingaschwabe@gmail.com>
 Depends:
     R (>= 2.12.1),
     MCMCpack,
