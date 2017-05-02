@@ -1,6 +1,5 @@
 export(simulate_twin_data)
 export(HPD)
-import(MCMCpack)
 import(foreign)
 import(R.utils)
 import(rjags)
