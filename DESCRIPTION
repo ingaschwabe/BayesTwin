@@ -7,12 +7,8 @@ Author: Inga Schwabe, Stephanie M. van den Berg
 Maintainer: Inga Schwabe <ingaschwabe@gmail.com>
 Depends:
     R (>= 2.12.1),
-    MCMCpack,
     foreign,
-    MCMCpack,
-    R.utils,
     rjags,
-    LearnBayes,
     coda,
     KernSmooth,
     xtable
