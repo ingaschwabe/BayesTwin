@@ -1,5 +1,4 @@
 export(simulate_twin_data)
-<<<<<<< HEAD
 export(IRT_twin)
 export(HPD)
 import(foreign)
@@ -8,8 +7,3 @@ import(stats)
 import(coda)
 import(graphics)
 import(matrixStats)
-=======
-export(HPD)
-import(foreign)
-import(rjags)
->>>>>>> 580e32ad986f43fb99925137796f29266474c179
