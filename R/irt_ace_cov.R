@@ -13,18 +13,12 @@
 # calling the master function twinUniv)
 # BayesTwin package
 #==========================================================
-
-<<<<<<< HEAD
 irt_ace_cov <- function(data_mz, data_dz, 
                         X_mz_twin1, X_mz_twin2,
                         X_dz_twin1, X_dz_twin2,
                         n_burnin, n_iter, ge, irt_model, N_cov,
                         var_prior, n_chains, fit_stats, inits, Nk){
-=======
-irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov,
-                        var_prior, n_chains, fit_stats){
->>>>>>> 580e32ad986f43fb99925137796f29266474c179
-    
+
     #Make boolean variable to create model string with the right IRT model 
     PL_1 = FALSE; PL_2 = FALSE; GPCM = FALSE; PCM = FALSE
     
@@ -49,12 +43,7 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
     
     # determine number of phenotypic items
     n_items <- ncol(data_mz)/2
-<<<<<<< HEAD
-    #Nk <- length(unique(data_mz[,1]))
-=======
-    Nk <- length(unique(data_mz[,1]))
->>>>>>> 580e32ad986f43fb99925137796f29266474c179
-    
+
     #==========================================================
     # I. Write JAGS model file
     #==========================================================
@@ -301,7 +290,7 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
         beta0 ~ dnorm(-1,.5)
         beta1 ~ dnorm(0,.1)",
         ""),"
-}")
+    }")
 
     jags_file_irt_ace_cov <- tempfile(fileext=".txt")
     write(jags_model_irt_ace_cov,jags_file_irt_ace_cov)
@@ -310,11 +299,6 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================   
-<<<<<<< HEAD
-=======
-    inits = NULL
-    
->>>>>>> 580e32ad986f43fb99925137796f29266474c179
     if (PCM == TRUE || GPCM == TRUE){
         jags_data <- list(data_mz, data_dz, n_mz, n_dz, n_items, Nk, rep(0, N_cov), diag(1,N_cov), N_cov,
                           X_mz_twin1, X_mz_twin2, X_dz_twin1, X_dz_twin2)
@@ -327,12 +311,8 @@ irt_ace_cov <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model, N_cov
                              "X_mz_twin1", "X_mz_twin2", "X_dz_twin1", "X_dz_twin2")    
     }
     
-<<<<<<< HEAD
     jags <- jags.model(file = jags_file_irt_ace_cov, data = jags_data, inits = inits, 
                        n.chains = n_chains, quiet=FALSE)
-=======
-    jags <- jags.model(jags_file_irt_ace_cov, jags_data, inits, n_chains = 1, quiet=FALSE)
->>>>>>> 580e32ad986f43fb99925137796f29266474c179
     update(jags, n_burnin)
     
     #Output, dependent on fit_stats, GE and IRT model

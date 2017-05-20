@@ -6,7 +6,6 @@
 # BayesTwin package
 #==========================================================
 
-#setwd("/Users/Inga/Dropbox/International student performance_IngaStephanie/R/BayesTwin3/R")
 simulate_twin_data <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
                                model = "ACE", n_items = 20, n_cat = 0, 
                                ge = FALSE, ge_beta0 = 0, ge_beta1 = 0, irt_model = "1PL"){
