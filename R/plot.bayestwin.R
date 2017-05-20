@@ -1,10 +1,11 @@
 #==========================================================
-# S3 Method for the generic plot function 
+# plot.bayestwin.R
+# S3 Method for the generic plot function
 # to plot sampling plots and histograms of posterior dist. 
 # BayesTwin package
 #==========================================================
 
-plot.samples <- function(x, type = "Histogram", ...){
+plot.bayestwin <- function(x, type = "Histogram", ...){
     
     if(type == "Histogram"){
         #Calculate HPD: 

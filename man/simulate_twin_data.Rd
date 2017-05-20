@@ -1,86 +1,51 @@
 \name{simulate_twin_data}
 \alias{simulate_twin_data}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{Simulation of twin data
-%%  ~~function to do ... ~~
-}
+\alias{simulatetwindata}
+\alias{simulate}
+\title{Simulate item-level twin data}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
-This function simulates twin data on basis of the ACE or ADE (coming in the future) model (Jinks & Fulker, 1970). It can be use to simulate single responses (sumscores), but also to simuulate item data. Item data is simulated on basis of the 1PL Rasch model (Rasch, 1960). Answers to covariates can be simulated as well. 
-}
+  Simulation of item-level twin data under the AE, ACE or ADE model with or without genotype by environment interaction (GxE).}
 \usage{
-simulate_twin_data(nmz, ndz, 
-                   var_a = 0.5, var_c = 0.3,  var_e = 0.2,
-                   model = "ACE", n_items = 0, n_var = 0)
+simulate_twin_data(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3, 
+var_e = 0.2, var_d = 0, model = "ACE", n_items = 20, n_cat = 0,
+ge = FALSE, ge_beta0 = 0, ge_beta1 = 0, irt_model = "1PL")
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nmz}{a numeric value, total number of MZ twins}
-  \item{ndz}{a numeric value, total number of DZ twins}
-  \item{var_a}{a numeric value, variance due to genetic effects. 
-               Defaults to 0.5}
-  \item{var_c}{a numeric value, variance due to shared-environmental effects. 
-               Defaults to 0.3}
-  \item{var_e}{a numeric value, variance due to unique-environmental effects. 
-               Defaults to 0.2}
-  \item{model}{specify the twin model that is used. 
-               At this moment only "ACE" available. "ADE" coming in the future}
-  \item{n_items}{numeric value, number of items when item data is simulated. Defaults to 0}
-  \item{n_var}{numeric value, number of covariates that are simulated. Defaults to 0}
+  \item{n_mz}{Number of monozygotic (MZ) twin pairs. Default value is 140.}
+  \item{n_dz}{Number of dizygotic (DZ) twin pairs. Default value is 360.}
+  \item{var_a}{Variance explained by additive genetic influences. Default value is 0.5.}
+  \item{var_c}{Variance explained by shared environmental influences. Default value is 0.3.}
+  \item{var_e}{Variance explained by unique environmental influences. Default value is 0.2.}
+  \item{var_d}{Variance explained by dominance genetic influences. As the default model is an "ACE"
+  model, the default value is set to 0.}
+  \item{model}{Biometric model used for the simulation, either "ACE", "ADE" or "AE". Default model is "ACE" model.}
+  \item{n_items}{Number of test items. Default value is 20.}
+  \item{n_cat}{Number of categories for the simulation of polytomous item data. As the default IRT model is a 1PL, the default is set 0.}
+  \item{ge}{Indication whether data is simulated with (ge = TRUE) or without (ge = FALSE) GxE. Default value is FALSE}
+  \item{ge_beta0}{When data is simulated with ge = TRUE, average environmental variance (when A = 0) has to be defined. Default value is 0.}
+  \item{ge_beta1}{When data is simulated with ge = TRUE, the GxE interaction parameter has to be defined. Default value is 0.}
+  \item{irt_model}{Choice of the measurement (IRT) model under which the item data is simulated. "1PL" = 1 PL model, "2PL" = 2PL model, "PCM" = Partial credit model, "GPCM" = Generalized partial credit model.}
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+ Item twin data is simulated under all common biometric models (i.e., A(C)E, ADE) with or without genotype by environment interaction (GxE). Data is simulated with an average phenotypic value of 0. For the simulation of dichotomous item data, the 1 PL or 2 PL can be used. For polytomous item data with three or more categories, the partial credit model or the generalized partial credit model can be used. 
+ 
+ 
+Genotype by environment interaction is defined modelled as heterogeneous unique-environmental variance and is defined as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Aij)} under the ACE model and as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Gij)} under the ADE model where \eqn{\beta0} refers to an intercept (unique-environmental variance when \eqn{Aij} or respectively \eqn{Gij = 0}) and \eqn{\beta1} represents the GxE interaction effect. \eqn{Aij} represents the genotypic value for twin \eqn{j} from family \eqn{i}, likewise \eqn{G} represents the total genotypic value (both additive and non-additive genetic effects) for twin \eqn{j} from family \eqn{i}. For more detail see Schwabe & van den Berg (2014), Behavior Genetics, 44(4), 394-406 and Schwabe, Boomsma & van den Berg (2017), Learning and Individual Differences, 54, 196-201. 
 }
+
 \value{
-\item{y_mz}{
-A matrix of nmz rows and 2 columns with the answers of all MZ twins. Answers of twin 1 in the first column, answers of twin 2 in the second column. 
-
-When item data is simulated for a total of k items, the result is a matrix of nmz rows for the i-th MZ family and 2 columns of k items for twin 1 [1:k] and twin 2 [k+1:2*k] For example, y_mz[1,22] is the response of 
-MZ twin 1 from family 1 to item 22 and y_mz[1,23] is the response of MZ twin 2 from family 1 to item 1 if n_items = 22
-}
-\item{y_dz}{
-A matrix with the answers of all DZ twins. Results are in the same structure as for y_mz
+Two matrices are returned, \code{y_mz} for MZ twin pairs and \code{y_dz} for DZ twin pairs. 
+For a total of \code{n_items}, the result is a matrix of \code{n_mz} rows for the i-th MZ family and 2*\code{n_items} columns with the item answers of the first (columns 1:\code{n_items}) and second twin (columns \code{n_items} + 1:2*\code{n_items}) of a family. For example, \code{y_mz[1,22]} is the response of the first twin from family 1 to item 22 and \code{y_mz[1,23]} is the response of the seocnd twin2 from family 1 to item 1 if \code{n_items} = 22. The same logic applies to the data of DZ families.
 }
 
-\item{cov_mz}{
-Responses of all MZ twins to covariates. A matrix of nmz rows and n_var columns. 
+\author{Inga Schwabe}
+
+\examples{\dontrun{
+#500 MZ twins, 800 DZ twins, ACE model, no GxE, 1 PL: 
+simulate_twin_data(n_mz = 500, n_dz = 800) 
+
+#140 MZ twins, 360 DZ twins, ADE model, GPCM: 
+simulate_twin_data(var_a = 0.4, var_d = 0.2, var_e = 0.4, model = "ADE", irt_model = "GPCM")
 }
-
-\item{cov_dz}{
-Responses of all MZ twins to covariates. A matrix of nmz rows and n_var columns. 
 }
-
-\references{
-}
-
-\author{
-Inga Schwabe <i.schwabe@utwente.nl>, Stephanie M. van den Berg
-}
-
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-\code{\link{ace_decomp}}
-}
-
-\examples{
-
-\dontrun{
-
-#Generate data of 300 MZ twins and 500 DZ twins to 5 covariates
-simulate_twin_data(nmz = 300, ndz = 500, n_var = 5)
-
-#Generate data of 300 MZ twins and 500 DZ twins to 50 items
-simulate_twin_data(nmz = 300, ndz = 500, n_items = 50)
-
-}
-
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{}
-\keyword{}% __ONLY ONE__ keyword per line
+\keyword{univar}
