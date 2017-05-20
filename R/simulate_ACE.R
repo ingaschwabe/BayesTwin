@@ -5,9 +5,13 @@
 # BayesTwin package
 #==========================================================
 
+<<<<<<< HEAD
 simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items, 
                         ge, ge_beta0, ge_beta1, irt_model,
                         n_cat){
+=======
+simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items, ge, ge_beta0, ge_beta1, irt_model){
+>>>>>>> 580e32ad986f43fb99925137796f29266474c179
 
     ## MZ twins:
     #Simulate common environmental effects, familial effects and retrieve genetic values for
@@ -49,6 +53,7 @@ simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items,
     #cor(pheno_mz[,1], pheno_mz[,2]) #to check, must be ~ var_a + var_c
     #cor(pheno_dz[,1], pheno_dz[,2]) #to check, must be ~ 1/2 var_a + var_c
     
+<<<<<<< HEAD
     if(irt_model == "1PL"){
         print("Using 1 PL model to generate item data...")
         
@@ -65,6 +70,24 @@ simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items,
         bp_mz <- t(matrix(bp, n_items, n_mz))   
         bp_dz <- t(matrix(bp, n_items, n_dz))
         
+=======
+    #Trait values
+    traits_mz_twin1 <- matrix(pheno_mz[,1], n_mz, n_items)
+    traits_mz_twin2 <- matrix(pheno_mz[,2], n_mz, n_items)
+    
+    traits_dz_twin1 <- matrix(pheno_dz[,1], n_dz, n_items)#DZ twins
+    traits_dz_twin2 <- matrix(pheno_dz[,2], n_dz, n_items)
+    
+    #Generate item patterns 
+    #Simulate data for the betas
+    bp <- as.matrix(rnorm(n_items, 0,1))
+    bp_mz <- t(matrix(bp, n_items, n_mz))   
+    bp_dz <- t(matrix(bp, n_items, n_dz))
+    
+    if(irt_model == "1PL"){
+        print("Using 1 PL model to generate item data...")
+        
+>>>>>>> 580e32ad986f43fb99925137796f29266474c179
         #Calculate p (simple Rasch model) for item data
         p_mz_twin1 <- (exp(traits_mz_twin1-bp_mz))/(1+(exp(traits_mz_twin1-bp_mz)))#MZ twins
         p_mz_twin2 <- (exp(traits_mz_twin2-bp_mz))/(1+(exp(traits_mz_twin2-bp_mz)))
@@ -86,6 +109,7 @@ simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items,
         y_dz <- matrix(0,n_dz,(n_items*2))
         y_dz[,1:(n_items)] <- dz_twin1_itemdata
         y_dz[,(n_items+1):(n_items*2)] <- dz_twin2_itemdata
+<<<<<<< HEAD
     } else if (irt_model == "PCM"){
         print("Using Partial Credit model to generate item data...")        
 
@@ -210,6 +234,10 @@ simulate_ACE = function(n_mz, n_dz, var_a, var_c, var_e, n_items,
         bp_mz <- t(matrix(bp, n_items, n_mz))   
         bp_dz <- t(matrix(bp, n_items, n_dz))
         
+=======
+    } else {
+        print("Using 2 PL model to generate item data...")
+>>>>>>> 580e32ad986f43fb99925137796f29266474c179
         alpha <- as.matrix(runif(n_items, .75,1.25))
         alpha_mz <- t(matrix(alpha, n_items, n_mz))   
         alpha_dz <- t(matrix(alpha, n_items, n_dz))
