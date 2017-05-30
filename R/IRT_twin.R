@@ -19,6 +19,10 @@ IRT_twin = function(data_mz, data_dz,
     #==========================================================
     # Error messages
     #==========================================================  
+    if(is.matrix(data_mz) == FALSE || is.matrix(data_dz) == FALSE){
+        stop("The phenotypic data has to be in matrix form!")
+    }
+    
     if (irt_model == "GPCM" && Nk == 0){
         stop("When you want to analyse the data under the GPCM, please specify the number of categories of your 
              phenotypic data (Nk)!")
@@ -283,6 +287,7 @@ IRT_twin = function(data_mz, data_dz,
     cat("\n")
     
     #Print results on the fly:
+    if (covariates == TRUE){print(output$results_b)}
     print(output$results)
     
     #Return output, but do not print it

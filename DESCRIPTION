@@ -1,8 +1,7 @@
 Package: BayesTwin
-Type: Package
-Title: Bayesian analysis of twin data
 Version: 1.0
-Date: 2014-09-11
+Title: Bayesian analysis of item-level twin data
+Date: 2017-06-1
 Author: Inga Schwabe
 Maintainer: Inga Schwabe <bayestwin@gmail.com>
 Depends:
@@ -11,5 +10,8 @@ Depends:
     coda,
     matrixStats,
     rjags
-Description: Bayesian analysis of twin data under the AE, ACE or ADE model. Analysis can be done using some scores but also on the item level, using an item response theory (IRT) model (1 PL, 2 PL or (G)PCM)
-License: GPL-2
+Description: Bayesian analysis of item-level hierarchical twin data using an integrated item response theory (IRT) model.
+License: GPL (>= 2)
+URL: https://www.ingaschwabe.com
+BugReports: bayestwin@gmail.com
+RoxygenNote: 6.0.1

@@ -13,13 +13,13 @@ HPD(sample, cred_int = 0.95)
 \details{
 The highest posterior density interval (HPD, see e.g. Box & Tia, 1992) contains the required mass such that all points within the interval have a higher probability density than points outside of the interval. 
 
-The function expects as input (parameter \code{sample}) a vector representing draws from the target distribution of the paramter of interest, as produced by the main function \code{IRT_twin} of this package.
+The function expects as input a vector representing draws from the target distribution of the paramter of interest, such as produced by the main function \code{IRT_twin} of this package.
 
 The result is a vector consisiting of two values, the first value representing the lower bound of the HPD and the second value representing the upper bound. 
 }
 
 \value{
-A vector of length 2 with the lower (first value) and upper (second value) bound of the HPD
+A vector of length 2 with the lower (first value) and upper (second value) bound of the HPD.
 }
 
 \author{Inga Schwabe}

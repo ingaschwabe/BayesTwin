@@ -57,27 +57,27 @@ simulate_twin_data <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,
               For more information see Schwabe & van den Berg (2014), Behavior Genetics, 44 (4), 394-406.")
     }
     
-    if(model == "AE" && ge == FALSE && (round(var_a + var_e,0) != 1)){
+    if(model == "AE" && ge == FALSE && (round(var_a + var_e,1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
     
-    if(model == "AE" && ge == TRUE && (round(var_a + exp(ge_beta0),0) != 1)){
+    if(model == "AE" && ge == TRUE && (round(var_a + exp(ge_beta0),1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
 
-    if(model == "ACE" && ge == FALSE && (round(var_a + var_c + var_e,0) != 1)){
+    if(model == "ACE" && ge == FALSE && (round(var_a + var_c + var_e,1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
     
-    if(model == "ACE" && ge == TRUE && (round(var_a + var_c + exp(ge_beta0),0) != 1)){
+    if(model == "ACE" && ge == TRUE && (round(var_a + var_c + exp(ge_beta0),1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
     
-    if(model == "ADE" && ge == FALSE && (round(var_a + var_d + var_e,0) != 1)){
+    if(model == "ADE" && ge == FALSE && (round(var_a + var_d + var_e,1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
     
-    if(model == "ADE" && ge == TRUE && (round(var_a + var_d + exp(ge_beta0),0) != 1)){
+    if(model == "ADE" && ge == TRUE && (round(var_a + var_d + exp(ge_beta0),1) != 1)){
         stop("Total phenotypic variance must be equal to 1! Please respecify variance components!")
     }
     

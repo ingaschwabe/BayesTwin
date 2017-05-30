@@ -27,10 +27,9 @@ ge = FALSE, ge_beta0 = 0, ge_beta1 = 0, irt_model = "1PL")
   \item{irt_model}{Choice of the measurement (IRT) model under which the item data is simulated. "1PL" = 1 PL model, "2PL" = 2PL model, "PCM" = Partial credit model, "GPCM" = Generalized partial credit model.}
 }
 \details{
- Item twin data is simulated under all common biometric models (i.e., A(C)E, ADE) with or without genotype by environment interaction (GxE). Data is simulated with an average phenotypic value of 0. For the simulation of dichotomous item data, the 1 PL or 2 PL can be used. For polytomous item data with three or more categories, the partial credit model or the generalized partial credit model can be used. 
+ Item twin data is simulated under all common biometric models (i.e., A(C)E, ADE) with or without genotype by environment interaction (GxE). Data is simulated with an average phenotypic value of 0. For the simulation of dichotomous item data, the 1 PL or 2 PL can be used. For polytomous item data with three or more categories, the partial credit model (PCM) or the generalized partial credit model (GPCM) can be used. 
  
- 
-Genotype by environment interaction is defined modelled as heterogeneous unique-environmental variance and is defined as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Aij)} under the ACE model and as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Gij)} under the ADE model where \eqn{\beta0} refers to an intercept (unique-environmental variance when \eqn{Aij} or respectively \eqn{Gij = 0}) and \eqn{\beta1} represents the GxE interaction effect. \eqn{Aij} represents the genotypic value for twin \eqn{j} from family \eqn{i}, likewise \eqn{G} represents the total genotypic value (both additive and non-additive genetic effects) for twin \eqn{j} from family \eqn{i}. For more detail see Schwabe & van den Berg (2014), Behavior Genetics, 44(4), 394-406 and Schwabe, Boomsma & van den Berg (2017), Learning and Individual Differences, 54, 196-201. 
+Genotype by environment interaction is defined modelled as heterogeneous unique-environmental variance and is defined as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Aij)} under the ACE model and as \eqn{\sigma^2Eij = exp (\beta0 + \beta1 Gij)} under the ADE model where \eqn{\beta0} refers to an intercept (unique-environmental variance when \eqn{Aij} or respectively \eqn{Gij = 0}) and \eqn{\beta1} represents the GxE interaction effect. \eqn{Aij} represents the genotypic value for twin \eqn{j} from family \eqn{i}, likewise \eqn{G} represents the total genotypic value (both additive and non-additive genetic effects) for twin \eqn{j} from family \eqn{i}. For more detail see Schwabe & van den Berg (2014, 2016) or Schwabe, Boomsma & van den Berg (2017).
 }
 
 \value{
@@ -39,12 +38,19 @@ For a total of \code{n_items}, the result is a matrix of \code{n_mz} rows for th
 }
 
 \author{Inga Schwabe}
+\references{
+Schwabe, I. & van den Berg, S.M. (2014). Assessing Genotype by Environment Interaction in Case of Heterogeneous Measurement Error, Behavior Genetics, 44 (4), 394-406.
 
+Schwabe, I., Jonker, W. & van den Berg, S.M. (2016). Genes, Culture and Conservatism - A Psychometric-Genetic Approach, Behavior Genetics, 46 (4), 516-52.
+
+Schwabe, I., Boomsma, D.I. & van den Berg, S.M. (2017). Increased Environmental Sensitivity in High Mathematics Performance. Learning and Individual Differences, 54, 196-201.
+}
 \examples{\dontrun{
 #500 MZ twins, 800 DZ twins, ACE model, no GxE, 1 PL: 
 simulate_twin_data(n_mz = 500, n_dz = 800) 
 
 #140 MZ twins, 360 DZ twins, ADE model, GPCM: 
-simulate_twin_data(var_a = 0.4, var_d = 0.2, var_e = 0.4, model = "ADE", irt_model = "GPCM")
+simulate_twin_data(var_a = 0.4, var_d = 0.2, var_e = 0.4, 
+                   model = "ADE", irt_model = "GPCM")
 }
 }

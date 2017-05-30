@@ -363,57 +363,134 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     # III. Organize results  
     #==========================================================
     if(ge == FALSE){
+        
         #Save samples
-        samples_var_a = 1/out$tau_a[,,1]; 
-        samples_var_e = 1/out$tau_e[,,1]; samples_item_b = out$item_b[,,1]
-        if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
+        if(n_chains > 1){
+            samples_var_a = 1/c(out$tau_a[,,1:n_chains])
+            samples_var_e = 1/c(out$tau_e[,,1:n_chains])
+            
+            if (PCM == TRUE || GPCM == TRUE){
+                samples_item_b = apply(out$item_b[,,,1:n_chains],c(1,2),function(x) cbind(x))
+            } else {
+                samples_item_b = t(apply(out$item_b[,,1:n_chains], 1, function(x) cbind(x)))
+            }
+            
+            if(PL_2 == TRUE || GPCM == TRUE){
+                samples_alpha = t(apply(out$alpha[,,1:n_chains], 1, function(x) cbind(x)))
+            }
+            
+        } else { 
+            samples_var_a = 1/out$tau_a[,,1]
+            samples_var_e = 1/out$tau_e[,,1]
+            
+            if (PCM == TRUE || GPCM == TRUE){
+                samples_item_b = apply(out$item_b[,,,1], c(1,2), function(x) cbind(x))
+            } else {
+                samples_item_b = out$item_b[,,1]
+            }
+            
+            if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
+            
+        }
         
         #Calculate mean values: 
-        var_a = mean(samples_var_a); var_e = mean(samples_var_e)
-        item_b = apply(samples_item_b, 1, mean)
-        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
+        var_a = mean(samples_var_a)
+        var_e = mean(samples_var_e)
+        
+        if (PCM == TRUE || GPCM == TRUE){
+            item_b = apply(samples_item_b, Nk, colMeans)
+            sd_item_b = apply(samples_item_b, Nk, colSds)
+        } else {
+            item_b = apply(samples_item_b, 1, mean)
+            sd_item_b = apply(samples_item_b, 1, sd)
+        }
+        
+        if(PL_2 == TRUE || GPCM == TRUE){
+            alpha = apply(samples_alpha, 1, mean)
+            sd_alpha = apply(samples_alpha, 1, sd)
+        }
         
         #Calculate SDs: 
-        sd_var_a = sd(samples_var_a);  sd_var_e = sd(samples_var_e)
-        sd_item_b = apply(samples_item_b, 1, sd)
-        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
+        sd_var_a = sd(samples_var_a) 
+        sd_var_e = sd(samples_var_e)
         
         #Calculate HPD: 
-        hpd_var_a = HPD(samples_var_a, 0.95); 
-        hpd_var_e = HPD(samples_var_e, 0.95); 
-        hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
-        if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
+        hpd_var_a = HPD(samples_var_a, 0.95)
+        hpd_var_e = HPD(samples_var_e, 0.95) 
         
-        #Put results in a table 
-        results = matrix(c(var_a, sd_var_a, var_e, sd_var_e), 2, 2)
-        colnames(results) <- c("varA", "varE")
-        rownames(results) <- c("Posterior mean","Posterior standard deviation")
+        #Put results in a table: variance components 
+        results = matrix(c(var_a, sd_var_a, hpd_var_a[1],hpd_var_a[2], 
+                           var_e, sd_var_e, hpd_var_e[1],hpd_var_e[2]), 4, 2)
+        colnames(results) <- c("varA","varC","varE")
+        rownames(results) <- c("Posterior mean","Posterior standard deviation", 
+                               "Lower 95% HPD interval", "Upper 95% HPD interval")
         results = as.table(results) 
         
         #And save output in a list: 
         if (fit_stats == FALSE){
-            output = list(results = results, samples_var_a = samples_var_a,
-                          samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                          hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e, 
-                          hpd_item_b = hpd_item_b)
-            
             if(PL_2 == TRUE || GPCM == TRUE){
-                output = list(results = results, samples_var_a = samples_var_a,
-                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e, 
-                              hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha)
-            }    
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a,
+                              samples_var_e = samples_var_e, 
+                              samples_item_b = samples_item_b, samples_alpha = samples_alpha,
+                              
+                              var_a = var_a, var_e = var_e, 
+                              item_b = item_b, alpha = alpha,
+                              
+                              sd_var_a = sd_var_a, sd_var_e = sd_var_e, 
+                              sd_item_b = sd_item_b, sd_alpha = sd_alpha, 
+                              
+                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e)
+            } else {
+                
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a, 
+                              samples_var_e = samples_var_e, 
+                              samples_item_b = samples_item_b,
+                              
+                              var_a = var_a, var_e = var_e, 
+                              item_b = item_b, 
+                              
+                              sd_var_a = sd_var_a, sd_var_e = sd_var_e, 
+                              sd_item_b = sd_item_b, 
+                              
+                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e)
+            }
         } else {
-            output = list(results = results, samples_var_a = samples_var_a,
-                          samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                          hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e, 
-                          hpd_item_b = hpd_item_b, dic = out_dic)
-            
             if(PL_2 == TRUE || GPCM == TRUE){
-                output = list(results = results, samples_var_a = samples_var_a,
-                              samples_var_e = samples_var_e, samples_item_b = samples_item_b,
-                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e, 
-                              hpd_item_b = hpd_item_b, samples_alpha = samples_alpha, hpd_alpha = hpd_alpha,
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a,
+                              samples_var_e = samples_var_e,
+                              samples_item_b = samples_item_b, samples_alpha = samples_alpha,
+                              
+                              var_a = var_a, var_e = var_e, 
+                              item_b = item_b, alpha = alpha,
+                              
+                              sd_var_a = sd_var_a, sd_var_e = sd_var_e, 
+                              sd_item_b = sd_item_b, sd_alpha = sd_alpha,  
+                              
+                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e,
+                              
+                              dic = out_dic)
+            } else {
+                
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a,
+                              samples_var_e = samples_var_e, 
+                              samples_item_b = samples_item_b,
+                              
+                              var_a = var_a, var_e = var_e, 
+                              item_b = item_b, 
+                              
+                              sd_var_a = sd_var_a, sd_var_e = sd_var_e, 
+                              sd_item_b = sd_item_b,
+                              
+                              hpd_var_a = hpd_var_a, hpd_var_e = hpd_var_e,
+                              
                               dic = out_dic)
             }
         }
@@ -428,71 +505,155 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         
     } else {
         #Save samples
-        samples_var_a = 1/out$tau_a[,,1]; 
-        samples_beta0 = out$beta0[,,1]; samples_beta1 = out$beta1[,,1]; samples_item_b = out$item_b[,,1]
-        if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
+        #Save samples
+        if(n_chains > 1){
+            samples_var_a = 1/c(out$tau_a[,,1:n_chains])
+            samples_beta0 = exp(c(out$beta0[,,1:n_chains]))
+            samples_beta1 = c(out$beta1[,,1:n_chains])
+            
+            if (PCM == TRUE || GPCM == TRUE){
+                samples_item_b = apply(out$item_b[,,,1:n_chains],c(1,2),function(x) cbind(x))
+            } else {
+                samples_item_b = t(apply(out$item_b[,,1:n_chains], 1, function(x) cbind(x)))
+            }
+            
+            if(PL_2 == TRUE || GPCM == TRUE){
+                samples_alpha = t(apply(out$alpha[,,1:n_chains], 1, function(x) cbind(x)))
+            }
+            
+        } else { 
+            samples_var_a = 1/out$tau_a[,,1]
+            samples_beta0 = exp(out$beta0[,,1])
+            samples_beta1 = out$beta1[,,1]
+            
+            if (PCM == TRUE || GPCM == TRUE){
+                samples_item_b = apply(out$item_b[,,,1], c(1,2), function(x) cbind(x))
+            } else {
+                samples_item_b = out$item_b[,,1]
+            }
+            
+            if(PL_2 == TRUE || GPCM == TRUE){samples_alpha = out$alpha[,,1]}
+            
+        }
+        
         
         #Calculate mean values: 
         var_a = mean(samples_var_a); 
         beta0 = mean(samples_beta0); beta1 = mean(samples_beta1)
-        item_b = apply(samples_item_b, 1, mean)
         if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
         
+        if (PCM == TRUE || GPCM == TRUE){
+            item_b = apply(samples_item_b, Nk, colMeans)
+            sd_item_b = apply(samples_item_b, Nk, colSds)
+        } else {
+            item_b = apply(samples_item_b, 1, mean)
+            sd_item_b = apply(samples_item_b, 1, sd)
+        }
+        
         #Calculate SDs: 
-        sd_var_a = sd(samples_var_a);
+        sd_var_a = sd(samples_var_a); 
         sd_beta0 = sd(samples_beta0); sd_beta1 = sd(samples_beta1)
-        sd_item_b = apply(samples_item_b, 1, sd)
-        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, mean)}
+        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, sd)}
         
         #Calculate HPD: 
         hpd_var_a = HPD(samples_var_a, 0.95); 
         hpd_beta0 = HPD(samples_beta0, 0.95); hpd_beta1 = HPD(samples_beta1, 0.95)
-        hpd_item_b = apply(samples_item_b, 1, function (x) HPD(x, 0.95))
-        if(PL_2 == TRUE || GPCM == TRUE){hpd_alpha = apply(samples_alpha, 1, function (x) HPD(x, 0.95))}
         
         #Put results in a table 
-        results = matrix(c(var_a, sd_var_a, beta0, sd_beta0, beta1, sd_beta1), 2, 3)
-        colnames(results) <- c("varA", "beta0", "beta1")
-        rownames(results) <- c("Posterior mean","Posterior standard deviation")
+        results = matrix(c(var_a, sd_var_a, hpd_var_a[1], hpd_var_a[2],
+                           beta0, sd_beta0, hpd_beta0[1], hpd_beta0[2],
+                           beta1, sd_beta1, hpd_beta1[1], hpd_beta1[2]), 4, 3)
+        colnames(results) <- c("varA","varC","beta0", "beta1")
+        rownames(results) <- c("Posterior mean","Posterior standard deviation", 
+                               "Lower 95% HPD interval", "Upper 95% HPD interval")
         results = as.table(results) 
         
         #And save output in a list: 
-        if (fit_stats == FALSE){
-            output = list(results = results, samples_var_a = samples_var_a, 
-                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                          hpd_var_a = hpd_var_a,hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                          hpd_item_b = hpd_item_b)
+        if(fit_stats == FALSE){
+            output = list(results = results, 
+                          
+                          samples_var_a = samples_var_a,
+                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, 
+                          samples_item_b = samples_item_b,
+                          
+                          var_a = var_a, beta0 = beta0, beta1 = beta1, 
+                          item_b = item_b, 
+                          
+                          sd_var_a = sd_var_a, 
+                          sd_beta0 = sd_beta0, sd_beta1 = sd_beta1,
+                          sd_item_b = sd_item_b,
+                          
+                          hpd_var_a = hpd_var_a, 
+                          hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1)
             
             if(PL_2 == TRUE || GPCM == TRUE){
-                output = list(results = results, samples_var_a = samples_var_a, 
-                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                              hpd_var_a = hpd_var_a, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                              hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha)
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a, 
+                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, 
+                              samples_item_b = samples_item_b, samples_alpha = samples_alpha,
+                              
+                              var_a = var_a, beta0 = beta0, beta1 = beta1, 
+                              item_b = item_b, alpha = alpha, 
+                              
+                              sd_var_a = sd_var_a,
+                              sd_beta0 = sd_beta0, sd_beta1 = sd_beta1,
+                              sd_item_b = sd_item_b, sd_alpha = sd_alpha, 
+                              
+                              hpd_var_a = hpd_var_a,  
+                              hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1)
             }
         } else {
-            output = list(results = results, samples_var_a = samples_var_a, 
-                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                          hpd_var_a = hpd_var_a,hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                          hpd_item_b = hpd_item_b, dic = out_dic)
+            output = list(results = results, 
+                          
+                          samples_var_a = samples_var_a, 
+                          samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, 
+                          samples_item_b = samples_item_b, 
+                          
+                          var_a = var_a, beta0 = beta0, beta1 = beta1, 
+                          item_b = item_b, 
+                          
+                          sd_var_a = sd_var_a,  
+                          sd_beta0 = sd_beta0, sd_beta1 = sd_beta1,
+                          sd_item_b = sd_item_b,
+                          
+                          hpd_var_a = hpd_var_a, 
+                          hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1, 
+                          
+                          dic = out_dic)
             
             if(PL_2 == TRUE || GPCM == TRUE){
-                output = list(results = results, samples_var_a = samples_var_a, 
-                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, samples_item_b = samples_item_b,
-                              hpd_var_a = hpd_var_a, hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1,
-                              hpd_item_b = hpd_item_b, hpd_alpha = hpd_alpha, samples_alpha = samples_alpha, dic = out_dic)
+                output = list(results = results, 
+                              
+                              samples_var_a = samples_var_a,
+                              samples_beta0 = samples_beta0, samples_beta1 = samples_beta1, 
+                              samples_item_b = samples_item_b, samples_alpha = samples_alpha,
+                              
+                              var_a = var_a, beta0 = beta0, beta1 = beta1, 
+                              item_b = item_b, alpha = alpha, 
+                              
+                              sd_var_a = sd_var_a, 
+                              sd_beta0 = sd_beta0, sd_beta1 = sd_beta1,
+                              sd_item_b = sd_item_b, sd_alpha = sd_alpha, 
+                              
+                              hpd_var_a = hpd_var_a, 
+                              hpd_beta0 = hpd_beta0, hpd_beta1 = hpd_beta1, 
+                              
+                              dic = out_dic)
             }
+            
+            
+            #Change class of objects in order to use right plot method 
+            class(output) <- c("ge_irt","list")    
+            class(output$samples_var_a) <- "bayestwin"
+            class(output$samples_beta0) <- "bayestwin"
+            class(output$samples_beta1) <- "bayestwin"     
+            class(output$samples_item_b) <- "bayestwin"
+            
+            if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
+            
         }
         
-        #Change class of objects in order to use right plot method 
-        class(output) <- c("bayestwin","list")    
-        class(output$samples_var_a) <- "bayestwin"
-        class(output$samples_beta0) <- "bayestwin"
-        class(output$samples_beta1) <- "bayestwin"     
-        class(output$samples_item_b) <- "bayestwin"
-        
-        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
-        
     }
-    
     return(output)
 }
