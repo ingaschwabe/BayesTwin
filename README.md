@@ -4,6 +4,7 @@ BayesTwin is an R package that can be used to perform bayesian analysis of item-
 Caution! To subroutines included in this package rely on the MCMC software package JAGS, which is freely obtainable at http://mcmc-jags.sourceforge.net. 
 
 ###Installation
+
 Install JAGS (http://mcmc-jags.sourceforge.net) and Rtools (https://cran.r-project.org/bin/windows/Rtools/index.html). 
 
 Then run in R:
