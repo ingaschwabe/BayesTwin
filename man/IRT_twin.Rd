@@ -2,7 +2,7 @@
 \alias{IRT_twin}
 \title{Bayesian analysis of item-level twin data}
 \description{
-    Bayesian analysis of item-level twin data under the AE, ACE or ADE model with or without genotype by environment interaction (GxE).}
+    Bayesian analysis of item-level twin data under the AE, ACE or ADE model. Covariates can be included an a GxE interaction effect can be estimated.}
 \usage{IRT_twin(data_mz, data_dz, 
          twin1_datacols_p, twin2_datacols_p, 
          twin1_datacols_cov = NA, twin2_datacols_cov = NA, 
@@ -38,12 +38,34 @@ GxE is defined modelled as heterogeneous unique-environmental variance and is de
 }
 
 \value{
+Output of the class "bayestwin" including samples, posterior point estimates, standard deviations and the 95\& HPD interval for variance components and, if applicable, regression parameters. Call str(results) if the output of \code{IRT_twin} is stored in an object called results to see a list of all stored variables. 
 
+Results are printed on the fly for variance components and, if applicable, regression parameters. 
 }
 
 \author{Inga Schwabe}
 
 \examples{\dontrun{
+##Simulate data
+data = simulate_twin_data(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 
+                          ge = TRUE)
+data_mz = data$y_mz
+data_dz = data$y_dz
+
+##Run analysis
+results = IRT_twin(data_mz, data_dz, 1:20, 21:40, ge = TRUE)
+
+##Summarize results: 
+summary(results)
+
+##Plot trace lines for var(A)
+plot_bayestwin(results$samples_var_a, type = "trace")
+
+##Plot posterior distribution of var(A)
+plot_bayestwin(results$samples_var_a)
+
+##Plot 95\% credibility region of GxE interaction effect
+ge_plot(results$var_a, results$samples_beta0, results$samples_beta1)
 }
 }
 \keyword{IRT_twin}

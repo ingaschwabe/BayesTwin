@@ -504,13 +504,6 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
                     }
                 }
         
-        #Change class of objects in order to use right plot method 
-        class(output) <- c("bayestwin","list")    
-        class(output$samples_var_a) <- "bayestwin"
-        class(output$samples_var_c) <- "bayestwin"
-        class(output$samples_var_e) <- "bayestwin"
-        class(output$samples_item_b) <- "bayestwin"
-        
         if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
         
     } else {
@@ -655,19 +648,25 @@ irt_ace <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
                               dic = out_dic)
         }
         
-        
-        #Change class of objects in order to use right plot method 
-        class(output) <- c("ge_irt","list")    
-        class(output$samples_var_a) <- "bayestwin"
-        class(output$samples_var_c) <- "bayestwin"
-        class(output$samples_beta0) <- "bayestwin"
-        class(output$samples_beta1) <- "bayestwin"     
-        class(output$samples_item_b) <- "bayestwin"
-        
-        if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
-        
                 }
     
     }
+    
+    #Change class of objects in order to use right plot method 
+    class(output$samples_var_a) <- "bayestwin"
+    class(output$samples_var_c) <- "bayestwin"
+    class(output$samples_item_b) <- "bayestwin"
+    class(output$results) = "bayestwin"
+    
+    if(ge == TRUE){
+        class(output$samples_beta0) <- "bayestwin"
+        class(output$samples_beta1) <- "bayestwin"     
+    }else{
+        class(output$samples_var_e) = "bayestwin"
+    }   
+    
+    if(PL_2 == TRUE || GPCM == TRUE){class(output$samples_alpha) <- "bayestwin"}
+    
+    
     return(output)
 }

@@ -18,9 +18,15 @@ IRT_twin = function(data_mz, data_dz,
                     N_cov = 0, inits = NA, Nk = 0){
     #==========================================================
     # Error messages
-    #==========================================================  
+    #========================================================== 
     if(is.matrix(data_mz) == FALSE || is.matrix(data_dz) == FALSE){
         stop("The phenotypic data has to be in matrix form!")
+    }
+    
+    if(var(c(data_dz[,c(twin1_datacols_p, twin2_datacols_p)],
+             data_mz[,c(twin1_datacols_p, twin2_datacols_p)])) <= 0.05){
+        warning("It seems that the total phenotypic variance is really low (<= 0.10).
+                If you are not already doing so, consider using univariate prior distributions!")
     }
     
     if (irt_model == "GPCM" && Nk == 0){
@@ -31,6 +37,22 @@ IRT_twin = function(data_mz, data_dz,
     if (irt_model == "PCM" && Nk == 0){
         stop("When you want to analyse the data under the PCM, please specify the number of categories of your 
              phenotypic data (Nk)!")
+    }
+    
+    if(irt_model == "GPCM" && "0" %in% data_mz[,c(twin1_datacols_p, twin2_datacols_p)] || 
+       irt_model == "PCM" && "0" %in% data_mz[,c(twin1_datacols_p, twin2_datacols_p)]){
+        stop("It looks like you are trying to estimate either a GPCM or PCM and your item data 
+             contains zeros. When estimating a GPCM or PCM, item data needs to be coded as e.g. 1 2 3 
+             for 3 answer categories instead of 0 1 2. Please recode your item data and run the analysis
+             again")
+    }
+    
+    if(irt_model == "GPCM" && "0" %in% data_dz[,c(twin1_datacols_p,twin2_datacols_p)] || 
+       irt_model == "PCM" && "0" %in% data_dz[,c(twin1_datacols_p,twin2_datacols_p)]){
+        stop("It looks like you are trying to estimate either a GPCM or PCM and your item data 
+             contains zeros. When estimating a GPCM or PCM, item data needs to be coded as e.g. 1 2 3 
+             for 3 answer categories instead of 0 1 2. Please recode your item data and run the analysis
+             again")
     }
     
     if(length(twin1_datacols_p) == 1){
@@ -88,11 +110,6 @@ IRT_twin = function(data_mz, data_dz,
     
     #Option I: Use covaritaes without missing value imputation: 
     if (is.na(twin1_datacols_cov) == FALSE){
-        
-        ### erst missings kijken want moet op hele data set!!!!!
-        without_missings = na.omit(data_mz[,c(twin1_datacols_cov, twin2_datacols_cov)])
-        
-        cov_data_mz_twin1 = data_mz[,twin1_datacols_cov]
         
         #Use only data with complete cases, meaning that cases with missing values
         #on covariate data will be ommited from the data anlysis, even if that means
@@ -189,6 +206,8 @@ IRT_twin = function(data_mz, data_dz,
                         inits = inits, Nk = Nk)              
     } 
     
+    
+    
     #==========================================================
     # Subroutines for ACE model
     #==========================================================
@@ -277,9 +296,9 @@ IRT_twin = function(data_mz, data_dz,
     #Remind user of convergence-issue
     cat("\n WARNING! \n")
     cat("It is important to check that the MCMC algorithm has converged to the posterior distribution! \n")
-    cat("To check convergence, you can use the posterior samples and the plot function with type = 'Sampling plot'. \n",
+    cat("To check convergence, you can use the posterior samples and the plot function with type = 'trace'. \n",
         "For example, call ACE_model$samples_var_a to obtain the samples for VAR(A) when the output of the analysis was saved in the object ACE_model. \n",
-        "You can then use plot(ACE_model$samples_vara_a, type = 'Sampling plot') to check the convergence of the VAR(A) parameter.\n")
+        "You can then use plot(ACE_model$samples_vara_a, type = 'trace') to check the convergence of the VAR(A) parameter.\n")
     cat("=================================================================")
     cat("\n For posterior means and standard deviations of all variance components, see below or use the summary function \n",
         "For example: summary(ACE_model$results) when the Ouptut of the analysis was saved in the object ACE_model).\n")
@@ -291,5 +310,6 @@ IRT_twin = function(data_mz, data_dz,
     print(output$results)
     
     #Return output, but do not print it
+    class(output) = "bayestwin"
     output
 }

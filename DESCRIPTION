@@ -5,7 +5,7 @@ Date: 2017-06-1
 Author: Inga Schwabe
 Maintainer: Inga Schwabe <bayestwin@gmail.com>
 Depends:
-    R (>= 2.12.1),
+    R (>= 3.4.0),
     foreign,
     coda,
     matrixStats,
@@ -13,5 +13,5 @@ Depends:
 Description: Bayesian analysis of item-level hierarchical twin data using an integrated item response theory (IRT) model.
 License: GPL (>= 2)
 URL: https://www.ingaschwabe.com
-BugReports: bayestwin@gmail.com
+BugReports: https://github.com/ingaschwabe/BayesTwin
 RoxygenNote: 6.0.1
