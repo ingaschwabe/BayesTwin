@@ -25,7 +25,7 @@ IRT_twin = function(data_mz, data_dz,
     
     if(var(c(data_dz[,c(twin1_datacols_p, twin2_datacols_p)],
              data_mz[,c(twin1_datacols_p, twin2_datacols_p)])) <= 0.05){
-        warning("It seems that the total phenotypic variance is really low (<= 0.10).
+        warning("It seems that the total phenotypic variance is really low (<= 0.05).
                 If you are not already doing so, consider using univariate prior distributions!")
     }
     
@@ -41,7 +41,7 @@ IRT_twin = function(data_mz, data_dz,
     
     if(irt_model == "GPCM" && "0" %in% data_mz[,c(twin1_datacols_p, twin2_datacols_p)] || 
        irt_model == "PCM" && "0" %in% data_mz[,c(twin1_datacols_p, twin2_datacols_p)]){
-        stop("It looks like you are trying to estimate either a GPCM or PCM and your item data 
+        stop("It looks like you are trying to estimate either a GPCM or PCM and your phenotypic item data 
              contains zeros. When estimating a GPCM or PCM, item data needs to be coded as e.g. 1 2 3 
              for 3 answer categories instead of 0 1 2. Please recode your item data and run the analysis
              again")
@@ -49,23 +49,18 @@ IRT_twin = function(data_mz, data_dz,
     
     if(irt_model == "GPCM" && "0" %in% data_dz[,c(twin1_datacols_p,twin2_datacols_p)] || 
        irt_model == "PCM" && "0" %in% data_dz[,c(twin1_datacols_p,twin2_datacols_p)]){
-        stop("It looks like you are trying to estimate either a GPCM or PCM and your item data 
+        stop("It looks like you are trying to estimate either a GPCM or PCM and your phenotypic item data 
              contains zeros. When estimating a GPCM or PCM, item data needs to be coded as e.g. 1 2 3 
              for 3 answer categories instead of 0 1 2. Please recode your item data and run the analysis
              again")
     }
     
-    if(length(twin1_datacols_p) == 1){
+    if(length(twin1_datacols_p) == 1 || length(twin2_datacols_p) == 1){
         stop("You need phenotypic data at item level to run the analysis! It is not possible to analyse sum scores")
     } 
     
-    if(length(twin2_datacols_p) == 1){
-        stop("You need phenotypic data at item level to run the analysis! It is not possible to analyse sum scores")
-    } 
-    
-    #Test if it's possible to calculate fit statistics: 
     if( n_chains < 2 && fit_stats == TRUE){
-        stop("If you want fit statisitcs, you need at least 2 Markov chains! Use the option n_chains to specify the number of chains")
+        stop("If you want fit statisitcs, you need at least 2 Markov chains! Use n_chains to specify the number of chains")
     } 
     
     if(is.na(twin1_datacols_cov) == FALSE && is.na(twin2_datacols_cov) == TRUE || 
@@ -76,6 +71,9 @@ IRT_twin = function(data_mz, data_dz,
              for the second twin of each family.")
     }
     
+    #==========================================================
+    # For JAGS analysis
+    #==========================================================
     #Calculate number of MZ and DZ twins: 
     n_mz = nrow(data_mz)
     n_dz = nrow(data_dz)
@@ -108,63 +106,31 @@ IRT_twin = function(data_mz, data_dz,
     #Test if covariates are used:
     covariates = NA
     
-    #Option I: Use covaritaes without missing value imputation: 
     if (is.na(twin1_datacols_cov) == FALSE){
+        covariates = TRUE
         
         #Use only data with complete cases, meaning that cases with missing values
         #on covariate data will be ommited from the data anlysis, even if that means
         #that we do not use all known phenotypic values.
+        if (any(is.na(data_mz[,c(twin1_datacols_cov, twin2_datacols_cov)])) == TRUE){
+            data_mz = data_mz[complete.cases(data_mz[,c(twin1_datacols_cov, twin2_datacols_cov)]),] 
+        }
         
-        #Which cases have missing values on covariate data: 
-        
-        without_missings = na.omit(data_mz[,c(twin1_datacols_cov, twin2_datacols_cov)])
-        data_mz = data_mz[without_missings[,ncol(data_mz)],] 
-        
-        data_dz[1:n_mz, ncol(data_dz)] = 1:n_dz         
-        without_missings = na.omit(data_dz[,c(twin1_datacols_cov, twin2_datacols_cov)])
-        data_dz = data_dz[without_missings[,ncol(data_dz)],] 
-        
-        #Select only covariate data on basis of new dataset without missings: 
+        if (any(is.na(data_dz[,c(twin1_datacols_cov, twin2_datacols_cov)])) == TRUE){
+            data_dz = data_dz[complete.cases(data_dz[,c(twin1_datacols_cov, twin2_datacols_cov)]),] 
+        }
+
+        #Select covariate data:
         X_mz_twin1 = data_mz[,twin1_datacols_cov]
         X_mz_twin2 = data_mz[,twin2_datacols_cov]
         X_dz_twin1 = data_dz[,twin1_datacols_cov]
         X_dz_twin2 = data_dz[,twin2_datacols_cov]
-        covariates = TRUE
         
-        #We have to know which covariates are dichotomous and which continous: 
-        is.binary = function(x){
-            length(unique(x)) <= 3 #allow for values 0,1 and NA. 
-        }
-        
-        dich = NA; cont = NA
-        
-        #Apply on all covariate data: (assuming that the same covariates cannot 
-        #be dichotomous for twin 1 and continous for twin 2 + assuming that 
-        #the same covariates are dichotomous for MZ and DZ twins
-        if(length(twin1_datacols_cov) > 1){
-            dich_cov = which(apply(X_mz_twin1, 2, is.binary) == TRUE)
-            cont_cov = which(apply(X_mz_twin1, 2, is.binary) == FALSE)
-            if(length(dich_cov) >= 1){
-                dich = TRUE
-            } else{
-                dich = FALSE
-            }
-            
-            if(length(cont_cov) >= 1){
-                cont = TRUE
-            } else {
-                cont = FALSE
-            }
-            
-        } else {
-            dich_cov = is.binary(X_mz_twin1)
-            if(dich_cov == FALSE){
-                dich = FALSE; cont = TRUE 
-                cont_cov = twin1_datacols_cov
-            } else {
-                dich = TRUE
-                dich_cov = twin1_datacols_cov
-            }
+        #Print warning message when binary data is used: 
+        if(is.categorical(X_mz_twin1) == TRUE || is.categorical(X_mz_twin2) == TRUE || 
+           is.categorical(X_dz_twin1) == TRUE || is.categorical(X_dz_twin2) == TRUE){
+            warning("It looks like (part) of your covariate data is of categorical nature. 
+                    Consider computing dummy variables! (this is not done automatically by the BayesTwin package")
         }
         
     } else {covariates = FALSE}
@@ -178,10 +144,6 @@ IRT_twin = function(data_mz, data_dz,
     #==========================================================
     # Subroutines for AE model
     #==========================================================
-    #Option for IRT model (1pl/2pl or (G)PCM) passed to function
-    #with irt_model object and option fo genotype by environment
-    #interaction by ge = FALSE/TRUE
-    
     #I. With covariates: 
     if(covariates == TRUE && decomp_model == "AE"){
         output = irt_ae_cov(data_mz = data_mz, data_dz = data_dz, 
@@ -207,14 +169,9 @@ IRT_twin = function(data_mz, data_dz,
     } 
     
     
-    
     #==========================================================
     # Subroutines for ACE model
     #==========================================================
-    #Option for IRT model (1pl/2pl or (G)PCM) passed to function
-    #with irt_model object and option fo genotype by environment
-    #interaction by ge = FALSE/TRUE
-    
     #I. With covariates: 
     if(covariates == TRUE && decomp_model == "ACE"){
         output = irt_ace_cov(data_mz = data_mz, data_dz = data_dz, 
@@ -245,10 +202,6 @@ IRT_twin = function(data_mz, data_dz,
     #==========================================================
     # Subroutines for ADE model
     #==========================================================
-    #Option for IRT model (1pl/2pl or (G)PCM) passed to function
-    #with irt_model object and option fo genotype by environment
-    #interaction by ge = FALSE/TRUE
-    
     #I. With covariates: 
     if(covariates == TRUE && decomp_model == "ADE"){
         output = irt_ade_cov(data_mz = data_mz, data_dz = data_dz, 

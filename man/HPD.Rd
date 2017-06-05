@@ -43,4 +43,4 @@ HPD(results$samples_var_a)
 apply(results$samples_item_b, 1, function (x) HPD(x, 0.90))
 }
 }
-\keyword{IRT_twin}
+\keyword{utilities}

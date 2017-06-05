@@ -54,3 +54,4 @@ simulate_twin_data(var_a = 0.4, var_d = 0.2, var_e = 0.4,
                    model = "ADE", irt_model = "GPCM")
 }
 }
+\keyword{utilities}

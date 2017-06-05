@@ -39,4 +39,4 @@ results = IRT_twin(data_mz = data$y_mz, data_dz = data$y_dz,
 ge_plot(results$var_a, results$samples_beta0, results$samples_beta1)
 }
 }
-\keyword{IRT_twin}
+\keyword{utilities}

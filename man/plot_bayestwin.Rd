@@ -20,4 +20,4 @@ plot_bayestwin(sample, type = "density", main, xlab, ylab, legend = TRUE, ...)}
 The function expects as input a vector representing draws from the posterior distributions of the parameter of interest, as produced by the main function \code{IRT_twin} of this package.
 }
 \author{Inga Schwabe}
-\keyword{IRT_twin}
+\keyword{utilities}
