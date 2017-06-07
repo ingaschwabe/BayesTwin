@@ -1,14 +1,14 @@
 #==========================================================
-# simulate_twin_data.R
+# simulatetwin.R
 # Simulation of twin data under the AE, ADE or ACE model,
 # using sum  scores or item scores, optional with GxE 
 # and/or environmental covariates
 # BayesTwin package
 #==========================================================
 
-simulate_twin_data <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
-                               model = "ACE", n_items = 20, n_cat = 0, 
-                               ge = FALSE, ge_beta0 = 0, ge_beta1 = 0, irt_model = "1PL"){
+simulatetwin <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_e = 0.2, var_d = 0, 
+                         model = "ACE", n_items = 20, n_cat = 0, 
+                         ge = FALSE, ge_beta0 = 0, ge_beta1 = 0, irt_model = "1PL"){
     
     #==========================================================
     # Error messages

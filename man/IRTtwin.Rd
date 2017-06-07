@@ -1,9 +1,9 @@
-\name{IRT_twin}
-\alias{IRT_twin}
+\name{IRTtwin}
+\alias{IRTtwin}
 \title{Bayesian analysis of item-level twin data}
 \description{
     Bayesian analysis of item-level twin data under the AE, ACE or ADE model. Covariates can be included an a GxE interaction effect can be estimated.}
-\usage{IRT_twin(data_mz, data_dz, 
+\usage{IRTtwin(data_mz, data_dz, 
          twin1_datacols_p, twin2_datacols_p, 
          twin1_datacols_cov = NA, twin2_datacols_cov = NA, 
          decomp_model = "ACE", irt_model = "1PL", ge = FALSE, 
@@ -47,25 +47,25 @@ Results are printed on the fly for variance components and, if applicable, regre
 
 \examples{\dontrun{
 ##Simulate data
-data = simulate_twin_data(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 
-                          ge = TRUE)
+data = simulate(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 
+                ge = TRUE)
 data_mz = data$y_mz
 data_dz = data$y_dz
 
 ##Run analysis
-results = IRT_twin(data_mz, data_dz, 1:20, 21:40, ge = TRUE)
+results = IRTtwin(data_mz, data_dz, 1:20, 21:40, ge = TRUE)
 
 ##Summarize results: 
 summary(results)
 
 ##Plot trace lines for var(A)
-plot_bayestwin(results$samples_var_a, type = "trace")
+plotbayestwin(results$samples_var_a, type = "trace")
 
 ##Plot posterior distribution of var(A)
-plot_bayestwin(results$samples_var_a)
+plotbayestwin(results$samples_var_a)
 
 ##Plot 95\% credibility region of GxE interaction effect
-ge_plot(results$var_a, results$samples_beta0, results$samples_beta1)
+geplot(results$var_a, results$samples_beta0, results$samples_beta1)
 }
 }
-\keyword{IRT_twin}
+\keyword{IRTtwin}
