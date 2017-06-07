@@ -6,11 +6,12 @@
 #==========================================================
 
 #==========================================================
+# summary.bayestwin
 # S3 Method for the generic summary function
 # to plot results of the IRT_twin.R function. 
 #==========================================================
 summary.bayestwin <- function(object, ...){
-    if(exists("x$results_b") == TRUE){
+    if(exists("object$results_b") == TRUE){
         return(list(object$results, object$results_b))
     }else{
         return(object$results)
@@ -18,12 +19,12 @@ summary.bayestwin <- function(object, ...){
 }
 
 #==========================================================
-#plot_bayestwin
+#plotbayestwin
 # Plot sampling plots and histograms of posterior dist. 
 #==========================================================
 
-plot_bayestwin <- function(sample, type = "density", 
-                           main, xlab, ylab, legend = TRUE, ...){
+plotbayestwin <- function(sample, type = "density", 
+                          main, xlab, ylab, legend = TRUE, lines = TRUE, ...){
     
     if(type == "density"){
         #Calculate HPD: 
@@ -33,38 +34,38 @@ plot_bayestwin <- function(sample, type = "density",
             main=paste("Posterior distribution of ",deparse(substitute(sample)),sep=" ")
         }
         
-        if(missing(xlab)){
-            xlab=deparse(substitute(sample))
-        }
-        
+        if(missing(xlab)){xlab=deparse(substitute(sample))}
         if(missing(ylab)){ylab = "Frequency"}
         
         #Plot histogram of posterior samples: 
         hist(sample, main=main, xlab=xlab, ylab=ylab, ...)
     
         #Lines to indicate lowest + highest region
-        abline(v = hpd[1], lwd = 2, col = "red")
-        abline(v = hpd[2], lwd = 2, col = "red")
-        abline(v= mean(sample), lwd = 2, col = "green")
-        abline(v= median(sample), lwd = 2, col = "yellow")
+        if (lines == TRUE){
+            abline(v = hpd[1], lwd = 2, col = "black")
+            abline(v = hpd[2], lwd = 2, col = "black")
+            abline(v= mean(sample), lwd = 2, col = "blue")
+            abline(v= median(sample), lwd = 2, col = "orange")
+        }
         
         #Add legend
-        legend("topright",
-               legend=c("95% HPD","Mean","Median"),
-               col=c("red","green","yellow"),lty=1,lwd=2,
-               cex=0.9, pt.cex = 21)
+        if(legend == TRUE){
+            legend("topright",
+                    legend=c("95% HPD","Mean","Median"),
+                    col=c("black","blue","orange"),lty=1,lwd=2,
+                    cex=0.9, pt.cex = 21)
+        }
         
     } else if (type == "trace"){
-        #Plot iteration-history: 
-        if (missing(ylab)){
-            ylab=deparse(substitute(sample))
+        #Plot iteration-history:
+        if(missing(main)){
+            main=paste("Iteration history of ",deparse(substitute(sample)),sep=" ")
         }
         
-        if(missing(xlab)){
-            xlab = "Iteration"
-        }
+        if (missing(ylab)){ylab=deparse(substitute(sample))}
+        if(missing(xlab)){xlab = "Iteration"}
         
-        plot.default(sample, type = "l", ylab=ylab, xlab=xlab, ...)
+        plot.default(sample, type = "l", ylab=ylab, xlab=xlab, main=main, ...)
         
     } else {
         plot.default(sample, ...)
@@ -72,10 +73,10 @@ plot_bayestwin <- function(sample, type = "density",
 }
 
 #==========================================================
-# ge_plot
+# geplot
 # Plot 95% CI of the GxE interaction
 #==========================================================
-ge_plot = function(var_a, samples_beta0, samples_beta1, main, xlab, ylab, col, ...){
+geplot = function(var_a, samples_beta0, samples_beta1, main, xlab, ylab, col, ...){
     max_a <- 2 * sqrt(var_a); min_a <- - 2 * sqrt(var_a)
     var_e = exp(log(samples_beta0) + samples_beta1 %*% t(seq(min_a, max_a, by = .1)))
     quantiles <- apply(var_e, 2, function(x) quantile(x,probs = c(0.05,0.50,0.95)))

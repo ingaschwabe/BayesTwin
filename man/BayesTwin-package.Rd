@@ -1,9 +1,7 @@
 \name{BayesTwin}
 \alias{BayesTwin}
 \docType{package}
-\title{
-    Bayesian analysis of item-level twin data
-}
+\title{Bayesian analysis of item-level twin data}
 \description{
 This package can be used to perform bayesian analysis of item-level twin data. Functions are included that help plot relevant information in figures and compute posterior statistics such as HPD intervals. 
 
@@ -38,7 +36,32 @@ To work, this packages requires the program JAGS to be in the PATH variable. JAG
 }
 \examples{
 \dontrun{
-#Simulate twin data under an ACE model
-simulate_twin_data(nmz = 300, ndz = 200)
+##Simulate Item-level twin data under the 1PL Rasch model 
+data = simulatetwin(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 
+                    ge = TRUE)
+                
+data_mz = data$y_mz
+data_dz = data$y_dz
+
+##Analyse the simulated data under an 1PL model with GxE
+results = IRTtwin(data_mz, data_dz, 1:20, 21:40, ge = TRUE)
+
+##Summarize results: 
+summary(results)
+
+#Using the output to obtain the 95\% HPD for additive genetic variance 
+HPD(results$samples_var_a)
+
+#Using the output to obtain the 90\% HPD for all item difficulty parameters
+apply(results$samples_item_b, 1, function (x) HPD(x, 0.90))
+
+##Plot trace lines for var(A)
+plotbayestwin(results$samples_var_a, type = "trace")
+
+##Plot posterior distribution of var(A)
+plotbayestwin(results$samples_var_a)
+
+##Plot 95\% credibility region of GxE interaction effect
+geplot(results$var_a, results$samples_beta0, results$samples_beta1)
 }
 }

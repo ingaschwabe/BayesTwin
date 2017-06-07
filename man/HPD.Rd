@@ -27,19 +27,10 @@ A vector of length 2 with the lower (first value) and upper (second value) bound
 Box, G., & Tiao, G. (1992). Bayesian inference in statistical analysis. New York: John Wiley & Sons.
 }
 \examples{\dontrun{
-#Simulate twin data under an ACE and 1PL model: 
-data = simulate_twin_data(irt_model = "ACE"", model = "1PL"", n_items = 20)
-data_mz = data$y_mz
-data_dz = data$y_dz
-
-#Analyse the data using the IRT_twin function: 
-results = IRT_twin(data_mz = data$y_mz, data_dz = data$y_dz,
-                  twin1_datacols_p = c(1:20), twin2_datacols_p = c(21:40))
-
-#Using the output to obtain the 95\% HPD for additive genetic variance 
+#Obtain the 95\% HPD for additive genetic variance 
 HPD(results$samples_var_a)
 
-#Using the output to obtain the 90\% HPD for all item difficulty parameters
+#Obtain the 90\% HPD for all item difficulty parameters
 apply(results$samples_item_b, 1, function (x) HPD(x, 0.90))
 }
 }
