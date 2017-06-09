@@ -553,7 +553,7 @@ irt_ae_cov <- function(data_mz, data_dz,
         #Calculate SDs: 
         sd_var_a = sd(samples_var_a); 
         sd_beta0 = sd(samples_beta0); sd_beta1 = sd(samples_beta1)
-        if(PL_2 == TRUE || GPCM == TRUE){alpha = apply(samples_alpha, 1, sd)}
+        if(PL_2 == TRUE || GPCM == TRUE){sd_alpha = apply(samples_alpha, 1, sd)}
         
         #Calculate HPD: 
         hpd_var_a = HPD(samples_var_a, 0.95); 
