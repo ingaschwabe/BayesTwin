@@ -346,16 +346,16 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     } else {
         if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_e", "item_b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_e", "item_b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "beta0", "beta1", "item_b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "beta0", "beta1", "item_b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_e", "item_b", "alpha"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_e", "item_b", "alpha"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else {
             out <- jags.samples(jags, c("tau_a", "beta0", "beta1", "item_b", "alpha"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "beta0", "beta1", "item_b", "alpha"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         }
     }
     
@@ -421,7 +421,7 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         #Put results in a table: variance components 
         results = matrix(c(var_a, sd_var_a, hpd_var_a[1],hpd_var_a[2], 
                            var_e, sd_var_e, hpd_var_e[1],hpd_var_e[2]), 4, 2)
-        colnames(results) <- c("varA","varC","varE")
+        colnames(results) <- c("varA","varE")
         rownames(results) <- c("Posterior mean","Posterior standard deviation", 
                                "Lower 95% HPD interval", "Upper 95% HPD interval")
         results = as.table(results) 
@@ -552,9 +552,10 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
         
         #Put results in a table 
         results = matrix(c(var_a, sd_var_a, hpd_var_a[1], hpd_var_a[2],
+                           var_e, sd_var_e, hpd_var_e[1], hpd_var_e[2],
                            beta0, sd_beta0, hpd_beta0[1], hpd_beta0[2],
                            beta1, sd_beta1, hpd_beta1[1], hpd_beta1[2]), 4, 3)
-        colnames(results) <- c("varA","varC","beta0", "beta1")
+        colnames(results) <- c("varA","varE","beta0", "beta1")
         rownames(results) <- c("Posterior mean","Posterior standard deviation", 
                                "Lower 95% HPD interval", "Upper 95% HPD interval")
         results = as.table(results) 
@@ -638,7 +639,6 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     
     #Change class of objects in order to use right plot method 
     class(output$samples_var_a) <- "bayestwin"
-    class(output$samples_var_c) <- "bayestwin"
     class(output$samples_item_b) <- "bayestwin"
     class(output$results) = "bayestwin"
     

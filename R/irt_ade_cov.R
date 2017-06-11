@@ -334,16 +334,16 @@ irt_ade_cov <- function(data_mz, data_dz,
     } else {
         if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b", "alpha", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_d", "tau_e", "item_b", "alpha", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else {
             out <- jags.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b", "alpha", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_d", "beta0", "beta1", "item_b", "alpha", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         }
     }
 
@@ -667,7 +667,7 @@ irt_ade_cov <- function(data_mz, data_dz,
     
     #Change class of objects in order to use right plot method 
     class(output$samples_var_a) <- "bayestwin"
-    class(output$samples_var_c) <- "bayestwin"
+    class(output$samples_var_d) <- "bayestwin"
     class(output$samples_item_b) <- "bayestwin"
     class(output$results) = "bayestwin"
     class(output$results_b) = "bayestwin"

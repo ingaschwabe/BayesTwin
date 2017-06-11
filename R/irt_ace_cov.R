@@ -329,16 +329,16 @@ irt_ace_cov <- function(data_mz, data_dz,
     } else {
         if (ge == FALSE && PL_1 == TRUE || ge == FALSE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == TRUE && PL_1 == TRUE || ge == TRUE && PCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else if (ge == FALSE && PL_2 == TRUE || ge == FALSE && GPCM == TRUE){
             out <- jags.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha", "b"), n_iter)
-            out_dic <- dic.samples(jags, c("tau_a", "tau_c", "tau_e", "item_b", "alpha", "b"), n_iter)
+            out_dic <- dic.samples(jags, n_iter)
         } else {
             out <- jags.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha", "b"), n_iter)
-            out_dic = dic.samples(jags, c("tau_a", "tau_c", "beta0", "beta1", "item_b", "alpha", "b"), n_iter)
+            out_dic = dic.samples(jags, n_iter)
         }
     }
 
