@@ -561,10 +561,9 @@ irt_ae_cov <- function(data_mz, data_dz,
         
         #Put results in a table 
         results = matrix(c(var_a, sd_var_a, hpd_var_a[1], hpd_var_a[2],
-                           var_e, sd_var_e, hpd_var_e[1], hpd_var_e[2],
                            beta0, sd_beta0, hpd_beta0[1], hpd_beta0[2],
                            beta1, sd_beta1, hpd_beta1[1], hpd_beta1[2]), 4, 3)
-        colnames(results) <- c("varA","varE","beta0", "beta1")
+        colnames(results) <- c("varA","beta0", "beta1")
         rownames(results) <- c("Posterior mean","Posterior standard deviation", 
                                "Lower 95% HPD interval", "Upper 95% HPD interval")
         results = as.table(results) 
