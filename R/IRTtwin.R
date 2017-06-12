@@ -102,7 +102,7 @@ IRTtwin = function(data_mz, data_dz,
     #Test if covariates are used:
     covariates = NA
     
-    if (is.na(twin1_datacols_cov) == FALSE){
+    if (any(is.na(twin1_datacols_cov)) == FALSE){
         covariates = TRUE
         
         #Use only data with complete cases, meaning that cases with missing values
