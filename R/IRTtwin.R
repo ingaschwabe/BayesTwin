@@ -19,6 +19,9 @@ IRTtwin = function(data_mz, data_dz,
     #==========================================================
     # Error messages
     #========================================================== 
+    print("Caution! To use the package BayesTwin you need to install the MCMC program JAGS, 
+           which can be freely obtained at http://mcmc-jags.sourceforge.net.")
+    
     if(is.matrix(data_mz) == FALSE || is.matrix(data_dz) == FALSE){
         stop("The phenotypic data has to be stored in matrix form!")
     }
