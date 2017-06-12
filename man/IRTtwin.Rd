@@ -38,7 +38,7 @@ GxE is defined modelled as heterogeneous unique-environmental variance and is de
 }
 
 \value{
-Output of the class "bayestwin" including samples, posterior point estimates, standard deviations and the 95\& HPD interval for variance components and, if applicable, regression parameters. Call str(results) if the output of \code{IRT_twin} is stored in an object called results to see a list of all stored variables. 
+Output of the class "bayestwin" including samples, posterior point estimates, standard deviations and the 95\% HPD interval for variance components and, if applicable, regression parameters. Call str(results) if the output of \code{IRT_twin} is stored in an object called results to see a list of all stored variables. 
 
 Results are printed on the fly for variance components and, if applicable, regression parameters. 
 }

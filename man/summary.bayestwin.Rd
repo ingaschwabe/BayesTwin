@@ -10,4 +10,4 @@
     \item{...}{Further arguments for the default S3 summary method}
 }
 \author{Inga Schwabe}
-\keyword{IRT_twin}
+\keyword{IRTtwin}
