@@ -281,7 +281,7 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     "," "),"
 
     ",ifelse(PL_2,"
-    alpha[1] <- 1 #fix first item to identify scale
+    alpha[1] ~ dnorm(1,1000) #fix first item to identify scale
     for (j in 2:n_items){
        alpha[j] ~ dlnorm(0, .1)
     }
@@ -293,7 +293,7 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     
     
     ",ifelse(GPCM,"
-    alpha[1] <- 1
+    alpha[1] ~ dnorm(1,1000) #fix first item to identify scale
 
     for (j in 2:n_items){
         alpha[j] ~ dlnorm(0, .1)
