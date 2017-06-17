@@ -268,7 +268,6 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     ",ifelse(INV_GAMMA,"
     tau_d ~ dgamma(1,1)
     tau_a ~ dgamma(1,1) 
-    tau_e ~ dgamma(1,1) #not used when ge = TRUE
     ","
     tau_d ~ dunif(0,100)
     tau_a ~ dunif(0,100)
@@ -323,7 +322,7 @@ irt_ade <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    ""),"
+    "tau_e ~ dgamma(1,1)"),"
     }")
 
     jags_file_irt_ade <- tempfile(fileext=".txt")

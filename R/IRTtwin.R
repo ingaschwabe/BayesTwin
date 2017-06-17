@@ -12,7 +12,7 @@ IRTtwin = function(data_mz, data_dz,
                    decomp_model = "ACE",
                    irt_model = "1PL",
                    ge = FALSE,
-                   n_iter = 9000, n_burnin = 7000,
+                   n_iter = 8000, n_burnin = 7000,
                    n_chains = 1, fit_stats = FALSE, 
                    var_prior = "INV_GAMMA",
                    N_cov = 0, inits = NA, Nk = 0){
@@ -26,11 +26,11 @@ IRTtwin = function(data_mz, data_dz,
         stop("The phenotypic data has to be stored in matrix form!")
     }
     
-    if(var(c(data_dz[,c(twin1_datacols_p, twin2_datacols_p)],
-             data_mz[,c(twin1_datacols_p, twin2_datacols_p)])) <= 0.05){
-        warning("It seems that the total phenotypic variance is rather low (<= 0.05).
-                If you are not already doing so, consider using univariate prior distributions!")
-    }
+    #if(var(c(data_dz[,c(twin1_datacols_p, twin2_datacols_p)],
+    #         data_mz[,c(twin1_datacols_p, twin2_datacols_p)])) <= 0.05){
+    #    warning("It seems that the total phenotypic variance is rather low (<= 0.05).
+    #            If you are not already doing so, consider using univariate prior distributions!")
+    #}
     
     if (irt_model == "GPCM" && Nk == 0){
         stop("When you want to analyse the data under the GPCM, please specify the number of categories of your 

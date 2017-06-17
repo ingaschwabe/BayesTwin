@@ -256,7 +256,6 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     #Priors
     ",ifelse(INV_GAMMA,"
     tau_a ~ dgamma(1,1) 
-    tau_e ~ dgamma(1,1) #not used when ge = TRUE
     ","
     tau_a ~ dunif(0,100)
     tau_e ~ dunif(0,100) #not used when ge = TRUE
@@ -311,7 +310,7 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    ""),"
+    "tau_e ~ dgamma(1,1)"),"
     }")
 
     jags_file_irt_ae <- tempfile(fileext=".txt")
