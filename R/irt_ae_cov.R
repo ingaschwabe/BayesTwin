@@ -350,7 +350,7 @@ irt_ae_cov <- function(data_mz, data_dz,
     
     #First regression coefficients
     if(N_cov == 1){
-        samples_b = out$b[,,1:n_chains]
+        samples_b = c(out$b[,,1:n_chains])
         b = mean(samples_b)
         sd_b = sd(samples_b)
         hpd_b = matrix(HPD(samples_b), 2,1)
