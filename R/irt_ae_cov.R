@@ -299,7 +299,6 @@ irt_ae_cov <- function(data_mz, data_dz,
     jags_file_irt_ae_cov <- tempfile(fileext=".txt")
     write(jags_model_irt_ae_cov,jags_file_irt_ae_cov)
     #writeLines(jags_model_irt_ae_cov, con = "file.txt", sep = "\n", useBytes = FALSE)
-    
     #==========================================================
     # II. Run JAGS analysis
     #==========================================================   
@@ -350,10 +349,17 @@ irt_ae_cov <- function(data_mz, data_dz,
     #==========================================================
     
     #First regression coefficients
-    samples_b = apply(out$b[,,1:n_chains], 1, function(x) cbind(x)) #col-wise
-    b = apply(samples_b, 2, mean) #col-wise
-    sd_b = apply(samples_b, 2, sd)
-    hpd_b = apply(samples_b, 2, HPD) #caution! also col-wise!
+    if(N_cov == 1){
+        samples_b = out$b[,,1:n_chains]
+        b = mean(samples_b)
+        sd_b = sd(samples_b)
+        hpd_b = matrix(HPD(samples_b), 2,1)
+    } else {
+        samples_b = apply(out$b[,,1:n_chains], 1, function(x) cbind(x)) #col-wise
+        b = apply(samples_b, 2, mean) #col-wise
+        sd_b = apply(samples_b, 2, sd)
+        hpd_b = apply(samples_b, 2, HPD) #caution! also col-wise!
+    }
     
     #Put results in table: 
     results_b = matrix(rep(NA,4*N_cov), 4, N_cov)

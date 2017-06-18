@@ -22,7 +22,6 @@ summary.bayestwin <- function(object, ...){
 #plotbayestwin
 # Plot sampling plots and histograms of posterior dist. 
 #==========================================================
-
 plotbayestwin <- function(sample, type = "density", 
                           main, xlab, ylab, legend = TRUE, lines = TRUE, ...){
     
@@ -95,7 +94,6 @@ geplot = function(var_a, samples_beta0, samples_beta1, main, xlab, ylab, col, ..
 # HPD
 # Calculate highest posterior density (HPD)
 #==========================================================
-
 HPD <- function(sample, cred_int = 0.95) {
     cred_int <- (1 - cred_int)/2 #calculate range outside of credibility region (both sides 2.5 in this case)
     lower <- round(length(sample) * cred_int, 0) 

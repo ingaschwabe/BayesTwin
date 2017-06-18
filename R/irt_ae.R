@@ -258,6 +258,8 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     
     
     #Priors
+    doubletau_a <- 2*tau_a
+    mu <- 0 #to identify scale 
     ",ifelse(INV_GAMMA,"
     tau_a ~ dgamma(1,1) 
     ","
