@@ -30,11 +30,19 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     } else {
         PCM = TRUE
     }
+    
+    
         
     #Make boolean variable to create model string with the right prior
-    INV_GAMMA = FALSE
+    INV_GAMMA = FALSE; INV_GAMMA_noGE = FALSE; UNIF_noGE = FALSE
     if(var_prior == "INV_GAMMA"){
         INV_GAMMA = TRUE
+    }
+    
+    if(var_prior == "INV_GAMMA" && ge == FALSE){
+        INV_GAMMA_noGE = TRUE
+    } else if (var_prior != "INV_GAMMA" && ge == FALSE){
+        UNIF_noGE = TRUE
     }
     
     #Determine number of twin pairs
@@ -250,17 +258,17 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     
     
     #Priors
-    mu <- 0 #to identify scale 
-    doubletau_a <- 2*tau_a
-
-    #Priors
     ",ifelse(INV_GAMMA,"
     tau_a ~ dgamma(1,1) 
     ","
     tau_a ~ dunif(0,100)
-    tau_e ~ dunif(0,100) #not used when ge = TRUE
-    "),"  
-    
+    ")," 
+    ",ifelse(INV_GAMMA_noGE,"
+    tau_e ~ dgamma(1,1)",
+    ""),"
+    ",ifelse(UNIF_noGE,"
+    tau_e ~ dunif(0,100)",
+    ""), "
     ",ifelse(PL_1,"
     for (j in 1:n_items){
       item_b[j] ~ dnorm(0,.1)
@@ -310,7 +318,7 @@ irt_ae <- function(data_mz, data_dz, n_burnin, n_iter, ge, irt_model,
     ",ifelse(ge,"
     beta0 ~ dnorm(-1,.5)
     beta1 ~ dnorm(0,.1)",
-    "tau_e ~ dgamma(1,1)"),"
+    ""),"
     }")
 
     jags_file_irt_ae <- tempfile(fileext=".txt")
