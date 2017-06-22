@@ -1,7 +1,7 @@
 Package: BayesTwin
 Version: 1.0
 Title: Bayesian analysis of item-level twin data
-Date: 2017-06-18
+Date: 2017-06-22
 Author: Inga Schwabe
 Maintainer: Inga Schwabe <bayestwin@gmail.com>
 Depends:
