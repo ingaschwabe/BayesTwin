@@ -5,10 +5,10 @@
 \title{Summary plots of BayesTwin MCMC-objects}
 \description{\code{plotbayestwin} returns either a density or trace plot for the target parameter.}
 \usage{
-plotbayestwin(sample, type = "density", main, xlab, ylab, legend = TRUE, lines = TRUE, ...)}
+plotbayestwin(sample, t = "density", main, xlab, ylab, legend = TRUE, lines = TRUE, ...)}
 \arguments{
   \item{sample}{A vector representing draws from the posterior distribution of the parameter of interest, as produced by the main function \code{IRT_twin} of this package}
- \item{type}{Type of plot that is produced, either "density" to get a histogram of the posterior distribution or "trace"to get a trace plot. Default value is "density"}
+ \item{t}{Type of plot that is produced, either "density" to get a histogram of the posterior distribution or "trace"to get a trace plot. Default value is "density"}
 \item{main}{An overall title for the plot}
 \item{xlab}{A title for the x axis}
 \item{ylab}{A title for the y axis}

@@ -7,7 +7,7 @@
          twin1_datacols_p, twin2_datacols_p, 
          twin1_datacols_cov = NA, twin2_datacols_cov = NA, 
          decomp_model = "ACE", irt_model = "1PL", ge = FALSE, 
-         n_iter = 7000, n_burnin = 8000, n_chains = 1, 
+         n_iter = 5000, n_burnin = 7000, n_chains = 1, 
          fit_stats = FALSE, var_prior = "INV_GAMMA", 
          N_cov = 0, inits = NA, Nk = 0)
 }
@@ -21,8 +21,8 @@
 \item{decomp_model}{Choice of the biometric model under which the data is analyzed, either "ACE", "ADE" or "AE". Default model is "ACE" model.}
 \item{irt_model}{Choice of the measurement (IRT) model under which the item data is simulated. "1PL" = 1 PL model, "2PL" = 2PL model, "PCM" = Partial credit model, "GPCM" = Generalized partial credit model..}
 \item{ge}{Indication whether data is analyzed with (ge = TRUE) or without (ge = FALSE) GxE. Default value is FALSE.}
-\item{n_iter}{Total number of MCMC iterations (without burn-in period). Default number is 10.000}
-\item{n_burnin}{Total number of burn-in iterations for the MCMC analysis. Default number is 8.000}
+\item{n_iter}{Total number of MCMC iterations (without burn-in period). Default number is 5.000}
+\item{n_burnin}{Total number of burn-in iterations for the MCMC analysis. Default number is 7.000}
 \item{n_chains}{Number of MCMC chains. Default number is 1.}
 \item{fit_stats}{Should be set to TRUE when fit statistics are needed (e.g., DIC, BIC). In this case, multiple chains need to be used (the parameter n_chains should be set to at least 2)}
 \item{var_prior}{Choice of prior distributions used for the variance compoenents, either "INV_GAMMA" for an inverse gamma distribution or "UNIF" for uniform distribution. For a low total phenotypic variance, uniform prior distributions are recommended. Default value is "INV_GAMMA".}

@@ -12,7 +12,7 @@ IRTtwin = function(data_mz, data_dz,
                    decomp_model = "ACE",
                    irt_model = "1PL",
                    ge = FALSE,
-                   n_iter = 7000, n_burnin = 8000,
+                   n_iter = 5000, n_burnin = 7000,
                    n_chains = 1, fit_stats = FALSE, 
                    var_prior = "INV_GAMMA",
                    N_cov = 0, inits = NA, Nk = 0){

@@ -22,10 +22,10 @@ summary.bayestwin <- function(object, ...){
 #plotbayestwin
 # Plot sampling plots and histograms of posterior dist. 
 #==========================================================
-plotbayestwin <- function(sample, type = "density", 
+plotbayestwin <- function(sample, t = "density", 
                           main, xlab, ylab, legend = TRUE, lines = TRUE, ...){
     
-    if(type == "density"){
+    if(t == "density"){
         #Calculate HPD: 
         hpd = HPD(sample, 0.95)
     
@@ -55,7 +55,7 @@ plotbayestwin <- function(sample, type = "density",
                     cex=0.9, pt.cex = 21)
         }
         
-    } else if (type == "trace"){
+    } else if (t == "trace"){
         #Plot iteration-history:
         if(missing(main)){
             main=paste("Iteration history of ",deparse(substitute(sample)),sep=" ")

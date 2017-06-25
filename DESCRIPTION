@@ -1,7 +1,7 @@
 Package: BayesTwin
 Version: 1.0
-Title: Bayesian analysis of item-level twin data
-Date: 2017-06-22
+Title: Bayesian Analysis of Item-Level Twin Data
+Date: 2017-06-23
 Author: Inga Schwabe
 Maintainer: Inga Schwabe <bayestwin@gmail.com>
 Depends:
@@ -10,8 +10,8 @@ Depends:
     coda,
     matrixStats,
     rjags
-Description: Bayesian analysis of item-level hierarchical twin data using an integrated item response theory (IRT) model.
+Description: Bayesian analysis of item-level hierarchical twin data using an integrated item response theory model.
 License: GPL (>= 2)
-URL: https://www.ingaschwabe.com
+URL: http://www.ingaschwabe.com
 BugReports: https://github.com/ingaschwabe/BayesTwin
 RoxygenNote: 6.0.1
