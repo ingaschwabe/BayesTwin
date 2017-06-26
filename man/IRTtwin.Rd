@@ -45,7 +45,19 @@ Results are printed on the fly for variance components and, if applicable, regre
 
 \author{Inga Schwabe}
 
-\examples{\dontrun{
+\examples{
+data(results)
+
+#Summarize results
+summary(results)
+
+##Plot posterior distribution of var(A)
+plotbayestwin(results$samples_var_a)
+
+##Plot 95\% credibility region of GxE interaction effect
+geplot(results$var_a, results$samples_beta0, results$samples_beta1)
+
+\dontrun{
 ##Simulate data
 data = simulate(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 
                 ge = TRUE)

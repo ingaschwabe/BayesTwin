@@ -45,7 +45,11 @@ Schwabe, I., Jonker, W. & van den Berg, S.M. (2016). Genes, Culture and Conserva
 
 Schwabe, I., Boomsma, D.I. & van den Berg, S.M. (2017). Increased Environmental Sensitivity in High Mathematics Performance. Learning and Individual Differences, 54, 196-201.
 }
-\examples{\dontrun{
+\examples{
+#100 MZ twins, 200 DZ twins, ACE model, no GxE, 1 PL: 
+simulatetwin(n_mz = 100, n_dz = 200) 
+
+\dontrun{
 #500 MZ twins, 800 DZ twins, ACE model, no GxE, 1 PL: 
 simulatetwin(n_mz = 500, n_dz = 800) 
 

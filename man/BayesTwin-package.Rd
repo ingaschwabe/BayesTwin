@@ -27,6 +27,9 @@ The function \code{simulate_twin_data} can be used to simulate item-level twin d
 \references{
 Schwabe, I. & van den Berg, S.M. (2014). Assessing Genotype by Environment Interaction in Case of Heterogeneous Measurement Error, Behavior Genetics, 44 (4), 394-406.
 
+Molenaar, D. & Dolan, C.V. (2014). Testing Systematic Genotype by Environment Interactions Using
+Item Level Data, Behavior Genetics, 44(3), 212-231.
+
 Schwabe, I., Jonker, W. & van den Berg, S.M. (2016). Genes, Culture and Conservatism - A Psychometric-Genetic Approach, Behavior Genetics, 46 (4), 516-52.
 
 Schwabe, I., Boomsma, D.I. & van den Berg, S.M. (2017). Increased Environmental Sensitivity in High Mathematics Performance. Learning and Individual Differences, 54, 196-201.
@@ -35,6 +38,15 @@ Schwabe, I., Boomsma, D.I. & van den Berg, S.M. (2017). Increased Environmental 
 To work, this packages requires the program JAGS to be in the PATH variable. JAGS can be freely obtained from http://mcmc-jags.sourceforge.net.
 }
 \examples{
+data(results)
+summary(results)
+
+#Using the output to obtain the 95\% HPD for additive genetic variance 
+HPD(results$samples_var_a)
+
+#Using the output to obtain the 90\% HPD for all item difficulty parameters
+apply(results$samples_item_b, 1, function (x) HPD(x, 0.90))
+
 \dontrun{
 ##Simulate Item-level twin data under the 1PL Rasch model 
 data = simulatetwin(irt_model = "1PL", var_a = 0.5, var_c = 0.3, ge_beta0 = log(0.2), 

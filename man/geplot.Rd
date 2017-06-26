@@ -25,9 +25,9 @@ The function expects as input the posterior point estimate for genetic variance 
 Plot of the 95\% credibility region of the GxE interaction.
 }
 \author{Inga Schwabe}
-\examples{\dontrun{
+\examples{
 #Using the output to plot the 95\% credibility region 
+data(results)
 geplot(results$var_a, results$samples_beta0, results$samples_beta1)
-}
 }
 \keyword{utilities}

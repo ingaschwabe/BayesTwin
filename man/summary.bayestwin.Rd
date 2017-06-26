@@ -10,4 +10,7 @@
     \item{...}{Further arguments for the default S3 summary method}
 }
 \author{Inga Schwabe}
+\examples{
+data(results)
+summary(results)}
 \keyword{IRTtwin}

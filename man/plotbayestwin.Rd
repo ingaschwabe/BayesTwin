@@ -21,12 +21,11 @@ plotbayestwin(sample, t = "density", main, xlab, ylab, legend = TRUE, lines = TR
 The function expects as input a vector representing draws from the posterior distributions of the parameter of interest, as produced by the main function \code{IRT_twin} of this package.
 }
 \author{Inga Schwabe}
-\examples{\dontrun{
-##Plot trace lines for var(A)
-plotbayestwin(results$samples_var_a, type = "trace")
+\examples{
+data(results)
 
 ##Plot posterior distribution of var(A)
 plotbayestwin(results$samples_var_a)
-}
+
 }
 \keyword{utilities}

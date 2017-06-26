@@ -26,12 +26,13 @@ A vector of length 2 with the lower (first value) and upper (second value) bound
 \references{
 Box, G., & Tiao, G. (1992). Bayesian inference in statistical analysis. New York: John Wiley & Sons.
 }
-\examples{\dontrun{
+\examples{
+data(results)
+
 #Obtain the 95\% HPD for additive genetic variance 
 HPD(results$samples_var_a)
 
 #Obtain the 90\% HPD for all item difficulty parameters
 apply(results$samples_item_b, 1, function (x) HPD(x, 0.90))
-}
 }
 \keyword{utilities}
