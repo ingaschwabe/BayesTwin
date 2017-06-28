@@ -3,9 +3,21 @@ BayesTwin is an R package that can be used for Bayesian inference of item-level 
  
 Caution! To use this package, you need to install the MCMC program JAGS which can be freely obtained at http://mcmc-jags.sourceforge.net.
 
+For an example analysis, see http://www.ingaschwabe.com/Exampleanalysis.html
+
 ### Installation
 
-Install JAGS (http://mcmc-jags.sourceforge.net) and Rtools (https://cran.r-project.org/bin/windows/Rtools/index.html). 
+#### Stable CRAN version
+Install JAGS (http://mcmc-jags.sourceforge.net) and R (https://www.r-project.org/).
+
+Then run in R:
+
+install.packages("BayesTwin")
+
+library(BayesTwin)
+
+#### Developmental Github version
+Install JAGS (http://mcmc-jags.sourceforge.net) and R (https://www.r-project.org/).
 
 Then run in R:
 
