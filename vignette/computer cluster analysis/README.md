@@ -9,5 +9,5 @@ In order to get the script working, you first have to make sure that BayesTwin a
 as well as is JAGS. In the accompanying unix script, also the path to the folder where R libraries are installed is included (you might need to adjust this to the folder you are using). 
 
 Furthermore, you need to use the same name for the R script and the folder the R script is included (here both are named Bayestwin).
-If you use another name, you need to adjust the unix script (e.g., instead of using file=bayestwin use file=**the name you are using**)
+If you use another name, you need to adjust the unix script (e.g., instead of using file=bayestwin use file= --the name you are using--)
 
