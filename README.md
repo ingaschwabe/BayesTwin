@@ -3,7 +3,8 @@ BayesTwin is an R package that can be used for Bayesian inference of item-level 
  
 Caution! To use this package, you need to install the MCMC program JAGS which can be freely obtained at http://mcmc-jags.sourceforge.net.
 
-For an example analysis, see http://www.ingaschwabe.com/Exampleanalysis.html
+You can find an example analysis using simulated data in the vignette map. 
+Depending on the sample-size and number of items included in the analysis, the analysis is computationally intensive and can take several hours to complete. In this case, it is recommended to run the analysis on a computer cluster. For an example analysis, see vignette/computer cluster analysis. 
 
 ### Installation
 
