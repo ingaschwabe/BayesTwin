@@ -38,16 +38,14 @@ simulatetwin <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_
     
     ##Errors regarding variance components and/or GxE
     if (var_e > 0 && ge_beta0 > 0){
-        cat("Warning! \n
-             Both VAR(E) and beta0 are specified. If a model without GxE is choosen, then the value given for var_e
-             will be used for data simulation. For a model with GxE, the beta0 parameter will be used.")
+        warning("Both VAR(E) and beta0 are specified. If a model without GxE is choosen, then the value given for var_e
+                 will be used for data simulation. For a model with GxE, the beta0 parameter will be used.")
     }
     
     if (var_d > 0 && var_c > 0){
-        cat("Warning! \n
-             You cannot specify variance due to shared-environmental effects (C) and variance due to 
-             dominance effects (D) at the same time. This model is not identified!
-             Depending on your model-choice (ACE/ADE), either var_c or var_d is used for the data simulation.")
+        warning("You cannot specify variance due to shared-environmental effects (C) and variance due to 
+                 dominance effects (D) at the same time. This model is not identified!
+                 Depending on your model-choice (ACE/ADE), either var_c or var_d is used for the data simulation.")
     }
     
     
@@ -82,10 +80,9 @@ simulatetwin <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_
     }
     
     if(ge == TRUE && var_e > 0){
-        cat("Warning! \n
-             A value has been chosen for argument value_e although the model under which the data will be 
-             simulated includes GxE. Under this model, the parameter ge_beta0 will be used which represents 
-             average environmental variance (see the help function for more details).")
+        warning("A value has been chosen for argument value_e although the model under which the data will be 
+                 simulated includes GxE. Under this model, the parameter ge_beta0 will be used which represents 
+                 average environmental variance (see the help function for more details).")
     }
     
     
@@ -102,8 +99,7 @@ simulatetwin <- function(n_mz = 140, n_dz = 360, var_a = 0.5, var_c = 0.3,  var_
     }
     
     if(n_dz == 0){
-        cat("Warning: \n
-                Unless you want to simulate data under the AE model, please chose a total number of DZ twins above 0.")
+        warning("Unless you want to simulate data under the AE model, please chose a total number of DZ twins above 0.")
     }
     
     if(n_mz == 0){

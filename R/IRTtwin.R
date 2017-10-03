@@ -19,7 +19,7 @@ IRTtwin = function(data_mz, data_dz,
     #==========================================================
     # Error messages
     #========================================================== 
-    cat("Caution! To use this package, you need to install the MCMC program JAGS
+    warning("Caution! To use this package, you need to install the MCMC program JAGS
         which can be freely obtained at http://mcmc-jags.sourceforge.net. \n")
     
     if(is.matrix(data_mz) == FALSE || is.matrix(data_dz) == FALSE){
