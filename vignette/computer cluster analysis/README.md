@@ -2,7 +2,7 @@
 
 The files included here can be used to run a BayesTwin analysis on a computer cluster and save the workspace. 
 
-The accompanying unix script can be directly used to run the analysis on the gentic computer cluster of LISA surfsara (https://ctg.cncr.nl/research/the_genetic_cluster_computer), but you might need to slightly 
+The accompanying unix script can be directly used to run the analysis on the genetic computer cluster of LISA surfsara (https://ctg.cncr.nl/research/the_genetic_cluster_computer), but you might need to slightly 
 adjust it when you want to run the analysis on another system. 
 
 In order to get the script working, you first have to make sure that BayesTwin and all dependencies are installed on the computer cluster 
