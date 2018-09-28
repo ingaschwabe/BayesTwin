@@ -2,7 +2,19 @@
 # simulate_AE.R
 # Simulation of twin data under the AE model 
 # Subroutine for master function simulate_twin_data()
-# BayesTwin package
+#
+# BayesTwin - An R Package for Bayesian Inference of Item-Level Twin Data
+# Copyright (C) 2014-2017 Inga Schwabe
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details
 #==========================================================
 
 simulate_AE = function(n_mz, n_dz, var_a, var_e, n_items, 

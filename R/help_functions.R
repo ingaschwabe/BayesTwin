@@ -5,7 +5,19 @@
 # Subroutines to calculate probabilites for every response
 # categories under the GPCM and PCM, check if response is binary
 #
-# BayesTwin package
+# BayesTwin - An R Package for Bayesian Inference of Item-Level Twin Data
+# Copyright (C) 2014-2017 Inga Schwabe
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details
+#
 #==========================================================
 
 #For warning in IRT_twin (check if dummy variables need to be used)

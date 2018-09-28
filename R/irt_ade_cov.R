@@ -11,7 +11,19 @@
 # the output. Estimation of genotype by environment 
 # interaction is optional (by defining ge = TRUE) when 
 # calling the master function twinUniv)
-# BayesTwin package
+# 
+# BayesTwin - An R Package for Bayesian Inference of Item-Level Twin Data
+# Copyright (C) 2014-2017 Inga Schwabe
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details
 #==========================================================
 
 irt_ade_cov <- function(data_mz, data_dz, 
